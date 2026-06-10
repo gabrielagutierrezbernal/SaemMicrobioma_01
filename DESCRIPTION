@@ -1,0 +1,10 @@
+Package: saemMicrobiome
+Title: Modelos SAEM para datos longitudinales de microbioma
+Version: 0.0.1
+Authors@R: person("Gabriela", "Gutierrez", email = "gabriella.gutierrez.bernal@gmail.com", role = c("aut", "cre"))
+Description: Implementacion de modelos ZIBR y ZIBBMR para datos longitudinales de microbioma, incluyendo una funcion madre para seleccionar el tipo de modelo.
+License: GPL-3
+Encoding: UTF-8
+Imports:
+    MASS,
+    stats
