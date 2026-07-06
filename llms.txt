@@ -1,0 +1,246 @@
+# saemMicrobiome
+
+`saemMicrobiome` implementa dos modelos mixtos con inflacion de ceros
+para datos longitudinales de microbioma, estimados con el algoritmo
+Stochastic Approximation EM (SAEM):
+
+- **ZIBR** (zero-inflated beta regression) para proporciones o
+  abundancias relativas — ver
+  \[[`fit_zibr()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/fit_zibr.md)\].
+- **ZIBBMR** (zero-inflated beta-binomial mixed regression) para conteos
+  con profundidad de secuenciacion conocida — ver
+  \[[`fit_zibbmr()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/fit_zibbmr.md)\].
+
+Ambos modelos y su algoritmo de estimacion fueron desarrollados
+originalmente por John Barrera:
+
+- ZIBR: <https://github.com/jbarrera232/saem-zibr>
+- ZIBBMR: <https://github.com/jbarrera232/saem-zibbmr>
+
+Este paquete organiza, documenta y testea esa implementacion para uso
+general en analisis de microbioma longitudinal.
+
+## Instalacion
+
+``` r
+
+# install.packages("remotes")
+remotes::install_github("gabrielagutierrezbernal/SaemMicrobioma_01")
+```
+
+## Ejemplo: ZIBR (proporciones)
+
+``` r
+
+library(saemMicrobiome)
+
+set.seed(1)
+dat <- simulate_zibr_data(
+  n_subjects = 30, n_time = 4,
+  X = matrix(rbinom(120, 1, 0.5)), Z = matrix(rbinom(120, 1, 0.5)),
+  alpha = c(-0.3, 0.5), beta = c(0.2, -0.4),
+  sigma_alpha = 0.4, sigma_beta = 0.3, phi = 15, seed = 1
+)
+
+fit <- fit_zibr(
+  y = dat$Y, id = dat$Subject, X = dat$X.1, Z = dat$Z.1,
+  phi_start = 10, alpha_start = c(-0.2, 0.1), beta_start = c(0.1, 0.1),
+  n_iter = 100, seed = 1, compute_fim = FALSE
+)
+
+print(fit)
+#> ===== Resultados SAEM-ZIBR =====
+#> == Parte logistica: p_it ==
+#>             Estimate   Type
+#> Intercept 0.04443142 Random
+#> X.1       0.06537826  Fixed
+#> == Parte beta: u_it ==
+#>              Estimate   Type
+#> Intercept  0.04305257 Random
+#> Z.1       -0.25059282  Fixed
+#> === Varianzas de efectos aleatorios ===
+#> == Parte logistica ==
+#>            Variance  sqrt.Var
+#> Intercept 0.1164129 0.3411933
+#> == Parte beta ==
+#>            Variance  sqrt.Var
+#> Intercept 0.2631274 0.5129595
+#> === Phi: 22.44654
+#> === Log-verosimilitud marginal (importance sampling): -48.88571
+```
+
+## Ejemplo: ZIBBMR (conteos con profundidad de secuenciacion)
+
+``` r
+
+S <- rep(1000, 120)
+dat_counts <- simulate_zibbmr_data(
+  n_subjects = 30, n_time = 4, S = S,
+  X = matrix(rbinom(120, 1, 0.5)), Z = matrix(rbinom(120, 1, 0.5)),
+  alpha = c(-0.3, 0.5), beta = c(0.2, -0.4),
+  sigma_alpha = 0.4, sigma_beta = 0.3, phi = 15, seed = 1
+)
+
+fit_counts <- fit_zibbmr(
+  y = dat_counts$Y, S = dat_counts$TotalCounts, id = dat_counts$Subject,
+  X = dat_counts$X.1, Z = dat_counts$Z.1,
+  phi_start = 10, alpha_start = c(-0.2, 0.1), beta_start = c(0.1, 0.1),
+  n_iter = 100, seed = 1, compute_fim = FALSE
+)
+
+print(fit_counts)
+#> ===== Resultados SAEM-ZIBBMR =====
+#> == Parte logistica: p_it ==
+#>               Estimate   Type
+#> Intercept 0.0004989888 Random
+#> X.1       0.1772606021  Fixed
+#> == Parte beta-binomial: u_it ==
+#>             Estimate   Type
+#> Intercept  0.2029850 Random
+#> Z.1       -0.5197964  Fixed
+#> === Varianzas de efectos aleatorios ===
+#> == Parte logistica ==
+#>             Variance  sqrt.Var
+#> Intercept 0.01455803 0.1206566
+#> == Parte beta-binomial ==
+#>             Variance  sqrt.Var
+#> Intercept 0.06336075 0.2517156
+#> === Phi: 24.4322
+#> === Log-verosimilitud marginal (importance sampling): -464.3804
+```
+
+## Ajuste por taxon y comparacion de modelos anidados
+
+``` r
+
+sim <- simular_datos_microbioma(n_ind = 15, n_time = 4, n_taxa = 3, seed = 1)
+
+full <- fit_zibr_taxon(
+  data = sim$proporcion, taxon = "Taxon1", id = "id",
+  covariates = c("tiempo", "grupo"), n_iter = 50, seed = 1
+)
+reduced <- fit_zibr_taxon(
+  data = sim$proporcion, taxon = "Taxon1", id = "id",
+  covariates = "tiempo", n_iter = 50, seed = 1
+)
+
+lrt_zibr(full, reduced, df = 1)
+#>    LL_full LL_reduced      LRT df    p_value
+#> 1 14.64046   12.90933 3.462264  1 0.06278431
+```
+
+## Mas informacion
+
+Ver
+[`vignette("get-started", package = "saemMicrobiome")`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/articles/get-started.md)
+para una introduccion mas completa, incluyendo cuando usar ZIBR
+vs. ZIBBMR y como preparar datos propios.
+
+# Package index
+
+## Ajuste de modelos
+
+Funciones principales para ajustar ZIBR y ZIBBMR.
+
+- [`fit_zibr()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/fit_zibr.md)
+  : Ajustar un modelo ZIBR (zero-inflated beta regression) via SAEM
+- [`fit_zibbmr()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/fit_zibbmr.md)
+  : Ajustar un modelo ZIBBMR (zero-inflated beta-binomial mixed
+  regression) via SAEM
+- [`ajustar_modelo_microbioma()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/ajustar_modelo_microbioma.md)
+  [`fit_saem_microbiome()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/ajustar_modelo_microbioma.md)
+  : Ajustar un modelo SAEM de microbioma (ZIBR o ZIBBMR) desde un data
+  frame
+
+## Ajuste por taxon
+
+- [`fit_zibr_taxon()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/fit_zibr_taxon.md)
+  : Ajustar ZIBR para un taxon de un data frame
+- [`fit_zibr_taxa()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/fit_zibr_taxa.md)
+  : Ajustar ZIBR para varios taxones de un data frame
+- [`fit_zibbmr_taxon()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/fit_zibbmr_taxon.md)
+  : Ajustar ZIBBMR para un taxon de un data frame
+- [`fit_zibbmr_taxa()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/fit_zibbmr_taxa.md)
+  : Ajustar ZIBBMR para varios taxones de un data frame
+
+## Simulacion de datos
+
+- [`simulate_zibr_data()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/simulate_zibr_data.md)
+  : Simular datos longitudinales para un modelo ZIBR
+- [`simulate_zibbmr_data()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/simulate_zibbmr_data.md)
+  : Simular datos longitudinales de conteo para un modelo ZIBBMR
+- [`simular_datos_microbioma()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/simular_datos_microbioma.md)
+  : Simular un conjunto de datos de microbioma con varios taxones
+
+## Comparacion de modelos (LRT)
+
+- [`lrt_zibr()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/lrt_zibr.md)
+  : Prueba de razon de verosimilitudes entre dos ajustes ZIBR anidados
+- [`lrt_zibr_table()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/lrt_zibr_table.md)
+  : Tabla de pruebas de razon de verosimilitudes para varios taxones
+  ZIBR
+- [`zibr_results_table()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/zibr_results_table.md)
+  : Tabla resumen de tres comparaciones LRT tipicas para ZIBR
+- [`lrt_zibbmr()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/lrt_zibbmr.md)
+  : Prueba de razon de verosimilitudes entre dos ajustes ZIBBMR anidados
+- [`lrt_zibbmr_table()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/lrt_zibbmr_table.md)
+  : Tabla de pruebas de razon de verosimilitudes para varios taxones
+  ZIBBMR
+- [`zibbmr_results_table()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/zibbmr_results_table.md)
+  : Tabla resumen de tres comparaciones LRT tipicas para ZIBBMR
+
+## Metodos S3
+
+- [`print(`*`<zibr_saem>`*`)`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/print.zibr_saem.md)
+  : Imprimir un ajuste ZIBR
+- [`plot(`*`<zibr_saem>`*`)`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/plot.zibr_saem.md)
+  : Graficar la traza de convergencia de un ajuste ZIBR
+- [`coef(`*`<zibr_saem>`*`)`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/coef.zibr_saem.md)
+  : Coeficientes estimados de un ajuste ZIBR
+- [`vcov(`*`<zibr_saem>`*`)`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/vcov.zibr_saem.md)
+  : Matriz de varianza-covarianza de un ajuste ZIBR
+- [`logLik(`*`<zibr_saem>`*`)`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/logLik.zibr_saem.md)
+  : Log-verosimilitud marginal de un ajuste ZIBR
+- [`print(`*`<zibbmr_saem>`*`)`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/print.zibbmr_saem.md)
+  : Imprimir un ajuste ZIBBMR
+- [`plot(`*`<zibbmr_saem>`*`)`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/plot.zibbmr_saem.md)
+  : Graficar la traza de convergencia de un ajuste ZIBBMR
+- [`coef(`*`<zibbmr_saem>`*`)`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/coef.zibbmr_saem.md)
+  : Coeficientes estimados de un ajuste ZIBBMR
+- [`vcov(`*`<zibbmr_saem>`*`)`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/vcov.zibbmr_saem.md)
+  : Matriz de varianza-covarianza de un ajuste ZIBBMR
+- [`logLik(`*`<zibbmr_saem>`*`)`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/logLik.zibbmr_saem.md)
+  : Log-verosimilitud marginal de un ajuste ZIBBMR
+- [`se()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/se.md)
+  : Errores estandar de un ajuste SAEM
+
+## Preparacion de datos
+
+- [`prepare_romero_zibr()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/prepare_romero_zibr.md)
+  : Preparar datos tipo Romero para ZIBR
+- [`prepare_romero_zibbmr()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/prepare_romero_zibbmr.md)
+  : Preparar datos tipo Romero para ZIBBMR
+
+## Compatibilidad historica
+
+Alias con la firma de los scripts originales de John Barrera.
+
+- [`saem_zibr_clean()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/saem_zibr_clean.md)
+  : Alias historico de fit_zibr con la firma del codigo original de
+  Barrera
+- [`sim_zibr_data_clean()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/sim_zibr_data_clean.md)
+  : Alias historico de simulate_zibr_data con la firma del codigo
+  original
+- [`saem_zibbmr_clean()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/saem_zibbmr_clean.md)
+  : Alias historico de fit_zibbmr con la firma del codigo original de
+  Barrera
+- [`sim_zibbmr_data_clean()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/sim_zibbmr_data_clean.md)
+  : Alias historico de simulate_zibbmr_data con la firma del codigo
+  original
+
+# Articles
+
+### All vignettes
+
+- [Introduccion a
+  saemMicrobiome](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/articles/get-started.md):
