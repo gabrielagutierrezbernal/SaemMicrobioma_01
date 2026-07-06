@@ -1,0 +1,169 @@
+---
+title: "Introduccion a saemMicrobiome"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduccion a saemMicrobiome}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(saemMicrobiome)
+```
+
+## Que problema resuelve este paquete
+
+Los datos de microbioma longitudinal (varias muestras por sujeto a lo largo
+del tiempo) suelen tener dos caracteristicas que los modelos mixtos
+estandar no manejan bien:
+
+1. **Inflacion de ceros**: muchos taxones estan ausentes en una fraccion
+   grande de las muestras, ademas de tener una distribucion continua
+   condicional a estar presentes.
+2. **Dependencia entre observaciones del mismo sujeto**: hay que modelar un
+   efecto aleatorio por sujeto, no solo efectos fijos.
+
+`saemMicrobiome` ofrece dos modelos para este problema, ambos estimados con
+el algoritmo Stochastic Approximation EM (SAEM) desarrollado por John
+Barrera:
+
+- **ZIBR** (`fit_zibr()`): para cuando la respuesta es una **proporcion**
+  (por ejemplo, abundancia relativa de un taxon respecto al total de la
+  muestra), en el intervalo `[0, 1)`.
+- **ZIBBMR** (`fit_zibbmr()`): para cuando la respuesta es un **conteo**
+  (numero de lecturas del taxon) junto con el total de lecturas de la
+  muestra (profundidad de secuenciacion). Es preferible a ZIBR cuando la
+  profundidad de secuenciacion varia mucho entre muestras, porque modela
+  esa variacion explicitamente en vez de solo trabajar con la proporcion ya
+  normalizada.
+
+## Simular datos y ajustar un modelo ZIBR
+
+```{r zibr-basico}
+set.seed(1)
+dat <- simulate_zibr_data(
+  n_subjects = 30, n_time = 4,
+  X = matrix(rbinom(120, 1, 0.5)), Z = matrix(rbinom(120, 1, 0.5)),
+  alpha = c(-0.3, 0.5), beta = c(0.2, -0.4),
+  sigma_alpha = 0.4, sigma_beta = 0.3, phi = 15, seed = 1
+)
+
+head(dat)
+
+fit <- fit_zibr(
+  y = dat$Y, id = dat$Subject, X = dat$X.1, Z = dat$Z.1,
+  phi_start = 10, alpha_start = c(-0.2, 0.1), beta_start = c(0.1, 0.1),
+  n_iter = 100, seed = 1, compute_fim = TRUE
+)
+
+fit
+```
+
+El objeto devuelto tiene metodos estandar de R para modelos ajustados:
+
+```{r zibr-metodos}
+coef(fit)
+logLik(fit)
+se(fit)
+```
+
+```{r zibr-plot, fig.width=7, fig.height=5}
+plot(fit)
+```
+
+## El mismo flujo para ZIBBMR (conteos)
+
+Cuando se tiene el conteo de lecturas y el total de lecturas por muestra,
+`fit_zibbmr()` modela directamente esa informacion con una verosimilitud
+beta-binomial, en vez de trabajar con la proporcion ya dividida:
+
+```{r zibbmr-basico}
+S <- rep(1000, 120)
+dat_counts <- simulate_zibbmr_data(
+  n_subjects = 30, n_time = 4, S = S,
+  X = matrix(rbinom(120, 1, 0.5)), Z = matrix(rbinom(120, 1, 0.5)),
+  alpha = c(-0.3, 0.5), beta = c(0.2, -0.4),
+  sigma_alpha = 0.4, sigma_beta = 0.3, phi = 15, seed = 1
+)
+
+fit_counts <- fit_zibbmr(
+  y = dat_counts$Y, S = dat_counts$TotalCounts, id = dat_counts$Subject,
+  X = dat_counts$X.1, Z = dat_counts$Z.1,
+  phi_start = 10, alpha_start = c(-0.2, 0.1), beta_start = c(0.1, 0.1),
+  n_iter = 100, seed = 1, compute_fim = FALSE
+)
+
+fit_counts
+```
+
+## Ajustar varios taxones de un data frame
+
+En la practica los datos vienen como un data frame ancho (una columna por
+taxon). `fit_zibr_taxon()`/`fit_zibbmr_taxon()` evitan tener que armar a
+mano las matrices `X`/`Z` para cada taxon, y `fit_zibr_taxa()`/
+`fit_zibbmr_taxa()` permiten ajustar varios taxones de una vez:
+
+```{r taxones}
+sim <- simular_datos_microbioma(n_ind = 15, n_time = 4, n_taxa = 3, seed = 1)
+head(sim$proporcion)
+
+fits <- fit_zibr_taxa(
+  data = sim$proporcion, taxa = sim$taxa, id = "id",
+  covariates = c("tiempo", "grupo"), n_iter = 50, seed = 1
+)
+
+sapply(fits, coef)
+```
+
+## Comparar modelos anidados con una prueba de razon de verosimilitudes
+
+Para decidir si una covariable aporta significativamente, se compara un
+modelo completo contra uno reducido (sin esa covariable) con `lrt_zibr()`/
+`lrt_zibbmr()`:
+
+```{r lrt}
+full <- fit_zibr_taxon(
+  data = sim$proporcion, taxon = "Taxon1", id = "id",
+  covariates = c("tiempo", "grupo"), n_iter = 50, seed = 1
+)
+reduced <- fit_zibr_taxon(
+  data = sim$proporcion, taxon = "Taxon1", id = "id",
+  covariates = "tiempo", n_iter = 50, seed = 1
+)
+
+lrt_zibr(full, reduced, df = 1)
+```
+
+Para muchos taxones a la vez, `lrt_zibr_table()`/`lrt_zibbmr_table()` arman
+una tabla con una fila por taxon.
+
+## La funcion "madre": fit_saem_microbiome()
+
+Si se prefiere no elegir entre `fit_zibr()`/`fit_zibbmr()` explicitamente,
+`fit_saem_microbiome()` (alias de `ajustar_modelo_microbioma()`) despacha
+al modelo correcto segun el argumento `modelo`, tomando la respuesta, el
+total de lecturas (si aplica) y las covariables directamente de un data
+frame por nombre de columna:
+
+```{r madre}
+fit_saem_microbiome(
+  modelo = "zibr", datos = sim$proporcion, taxon = "Taxon1",
+  id = "id", covariables = c("tiempo", "grupo"), iter = 50, seed = 1
+)
+```
+
+## Datos propios: preparar un dataset tipo Romero
+
+Si los datos vienen en el formato del estudio Romero (una lista con
+`SampleData` y `OTU`), `prepare_romero_zibr()`/`prepare_romero_zibbmr()`
+arman las covariables estandar (tiempo de gestacion escalado, edad
+escalada, interaccion tiempo-embarazo) y filtran taxones por proporcion de
+ceros, dejando todo listo para `fit_zibr_taxon()`/`fit_zibbmr_taxon()`. Ver
+`?prepare_romero_zibr` para el formato esperado de `SampleData`/`OTU`.

@@ -1,0 +1,62 @@
+url: https://gabrielagutierrezbernal.github.io/saemMicrobiome_01/
+
+template:
+  bootstrap: 5
+
+reference:
+- title: Ajuste de modelos
+  desc: Funciones principales para ajustar ZIBR y ZIBBMR.
+  contents:
+  - fit_zibr
+  - fit_zibbmr
+  - fit_saem_microbiome
+  - ajustar_modelo_microbioma
+
+- title: Ajuste por taxon
+  contents:
+  - fit_zibr_taxon
+  - fit_zibr_taxa
+  - fit_zibbmr_taxon
+  - fit_zibbmr_taxa
+
+- title: Simulacion de datos
+  contents:
+  - simulate_zibr_data
+  - simulate_zibbmr_data
+  - simular_datos_microbioma
+
+- title: Comparacion de modelos (LRT)
+  contents:
+  - lrt_zibr
+  - lrt_zibr_table
+  - zibr_results_table
+  - lrt_zibbmr
+  - lrt_zibbmr_table
+  - zibbmr_results_table
+
+- title: Metodos S3
+  contents:
+  - print.zibr_saem
+  - plot.zibr_saem
+  - coef.zibr_saem
+  - vcov.zibr_saem
+  - logLik.zibr_saem
+  - print.zibbmr_saem
+  - plot.zibbmr_saem
+  - coef.zibbmr_saem
+  - vcov.zibbmr_saem
+  - logLik.zibbmr_saem
+  - se
+
+- title: Preparacion de datos
+  contents:
+  - prepare_romero_zibr
+  - prepare_romero_zibbmr
+
+- title: Compatibilidad historica
+  desc: Alias con la firma de los scripts originales de John Barrera.
+  contents:
+  - saem_zibr_clean
+  - sim_zibr_data_clean
+  - saem_zibbmr_clean
+  - sim_zibbmr_data_clean
