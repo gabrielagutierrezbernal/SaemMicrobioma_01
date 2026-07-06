@@ -7,24 +7,8 @@
 
 
 #### Log-verosimilitudes condicionales usadas en el paso M ####
-
-.zibbmr_neg_loglik_zero <- function(alpha_fixed, psi_chain, alpha_random,
-                                    x_design_chain, id_chain, is_positive_chain,
-                                    is_zero_chain, n_alpha) {
-  fixed_index <- which(!alpha_random)
-  n_rows <- nrow(psi_chain)
-
-  psi_chain[, fixed_index] <- matrix(
-    rep(alpha_fixed, each = n_rows),
-    ncol = length(alpha_fixed),
-    nrow = n_rows
-  )
-
-  p <- .saem_linear_prob(psi_chain, seq_len(n_alpha), id_chain, x_design_chain)
-
-  loglik <- sum(log(1 - p[is_zero_chain])) + sum(log(p[is_positive_chain]))
-  -loglik
-}
+#### (.saem_neg_loglik_zero, la parte de inflacion de ceros, vive en ####
+####  R/utils.R, compartida con ZIBR) ####
 
 .zibbmr_neg_loglik_beta_binomial <- function(par, psi_chain, beta_random,
                                              z_design_chain, id_chain,
@@ -188,7 +172,7 @@
 
   if (zi && n_alpha_random != n_alpha) {
     alpha_grad <- -numDeriv::grad(
-      .zibbmr_neg_loglik_zero,
+      .saem_neg_loglik_zero,
       alpha[!alpha_random],
       psi_chain = psi_chain,
       alpha_random = alpha_random,
@@ -275,7 +259,7 @@
 
   if (zi && n_alpha_random != n_alpha) {
     alpha_hess <- -numDeriv::hessian(
-      .zibbmr_neg_loglik_zero,
+      .saem_neg_loglik_zero,
       alpha[!alpha_random],
       psi_chain = psi_chain,
       alpha_random = alpha_random,
@@ -750,7 +734,7 @@ fit_zibbmr <- function(y, S, id, X = NULL, Z = NULL, zi = TRUE,
         if (n_alpha_random != n_alpha) {
           alpha_opt <- stats::nlminb(
             start = alpha[!alpha_random],
-            objective = .zibbmr_neg_loglik_zero,
+            objective = .saem_neg_loglik_zero,
             psi_chain = psi_chain,
             alpha_random = alpha_random,
             x_design_chain = x_design_chain,
@@ -1078,62 +1062,7 @@ simulate_zibbmr_data <- function(n_subjects, n_time, S, zi = TRUE,
 #' @return `x`, de forma invisible.
 #' @export
 print.zibbmr_saem <- function(x, ...) {
-  cat("===== Resultados SAEM-ZIBBMR =====\n")
-
-  if (x$zi) {
-    alpha <- x$mu[seq_len(x$n_alpha)]
-    alpha_tab <- data.frame(
-      Estimate = alpha,
-      Type = ifelse(x$alpha_random, "Random", "Fixed"),
-      Variance = 0,
-      sqrt.Var = 0,
-      row.names = x$alpha_labels
-    )
-
-    n_alpha_random <- sum(x$alpha_random)
-    if (n_alpha_random > 0) {
-      alpha_tab[x$alpha_random, "Variance"] <- diag(x$G)[seq_len(n_alpha_random)]
-      alpha_tab[, "sqrt.Var"] <- sqrt(alpha_tab[, "Variance"])
-    }
-
-    cat("== Parte logistica: p_it ==\n")
-    print(alpha_tab[, c("Estimate", "Type")])
-  } else {
-    n_alpha_random <- 0
-  }
-
-  beta <- x$mu[x$n_alpha + seq_len(x$n_beta)]
-  beta_tab <- data.frame(
-    Estimate = beta,
-    Type = ifelse(x$beta_random, "Random", "Fixed"),
-    Variance = 0,
-    sqrt.Var = 0,
-    row.names = x$beta_labels
-  )
-
-  n_beta_random <- sum(x$beta_random)
-  if (n_beta_random > 0) {
-    beta_tab[x$beta_random, "Variance"] <- diag(x$G)[n_alpha_random + seq_len(n_beta_random)]
-    beta_tab[, "sqrt.Var"] <- sqrt(beta_tab[, "Variance"])
-  }
-
-  cat("== Parte beta-binomial: u_it ==\n")
-  print(beta_tab[, c("Estimate", "Type")])
-
-  cat("=== Varianzas de efectos aleatorios ===\n")
-  if (x$zi && n_alpha_random > 0) {
-    cat("== Parte logistica ==\n")
-    print(alpha_tab[x$alpha_random, c("Variance", "sqrt.Var"), drop = FALSE])
-  }
-  if (n_beta_random > 0) {
-    cat("== Parte beta-binomial ==\n")
-    print(beta_tab[x$beta_random, c("Variance", "sqrt.Var"), drop = FALSE])
-  }
-
-  cat("=== Phi: ", x$phi, "\n", sep = "")
-  cat("=== Log-verosimilitud marginal (importance sampling): ", x$loglik, "\n", sep = "")
-
-  invisible(x)
+  .saem_print(x, model_label = "SAEM-ZIBBMR", beta_label = "Parte beta-binomial")
 }
 
 #' Graficar la traza de convergencia de un ajuste ZIBBMR
@@ -1144,29 +1073,7 @@ print.zibbmr_saem <- function(x, ...) {
 #'   graficar.
 #' @export
 plot.zibbmr_saem <- function(x, ...) {
-  trace <- x$trace
-  n_iter <- nrow(trace)
-  burn_in <- floor(0.75 * n_iter)
-  n_panels <- ncol(trace)
-  n_rows <- ceiling(n_panels / 3)
-
-  old_par <- graphics::par(no.readonly = TRUE)
-  on.exit(graphics::par(old_par), add = TRUE)
-
-  graphics::par(mfrow = c(n_rows, 3))
-  for (j in seq_len(n_panels)) {
-    graphics::plot(
-      seq_len(n_iter),
-      trace[, j],
-      type = "l",
-      xlab = "Iteracion",
-      ylab = "Valor",
-      main = colnames(trace)[j]
-    )
-    graphics::abline(v = burn_in, lty = 2)
-  }
-
-  invisible(x)
+  .saem_plot_trace(x, ...)
 }
 
 #' Log-verosimilitud marginal de un ajuste ZIBBMR
@@ -1177,11 +1084,7 @@ plot.zibbmr_saem <- function(x, ...) {
 #'   importance sampling, con atributos `df` y `nobs`.
 #' @export
 logLik.zibbmr_saem <- function(object, ...) {
-  value <- object$loglik
-  attr(value, "df") <- length(object$mu) + 1 + length(diag(object$G))
-  attr(value, "nobs") <- object$nobs
-  class(value) <- "logLik"
-  value
+  .saem_logLik(object)
 }
 
 #' Coeficientes estimados de un ajuste ZIBBMR
@@ -1192,7 +1095,7 @@ logLik.zibbmr_saem <- function(object, ...) {
 #'   seguidos de los de la parte beta-binomial.
 #' @export
 coef.zibbmr_saem <- function(object, ...) {
-  object$mu
+  .saem_coef(object)
 }
 
 #' Matriz de varianza-covarianza de un ajuste ZIBBMR
@@ -1202,17 +1105,13 @@ coef.zibbmr_saem <- function(object, ...) {
 #' @return Una matriz de varianza-covarianza.
 #' @export
 vcov.zibbmr_saem <- function(object, ...) {
-  if (is.null(object$fisher_stoch)) {
-    stop("El ajuste no contiene matriz FIM. Reajusta con compute_fim = TRUE.", call. = FALSE)
-  }
-
-  -solve(object$fisher_stoch)
+  .saem_vcov(object)
 }
 
 #' @rdname se
 #' @export
 se.zibbmr_saem <- function(object, ...) {
-  sqrt(diag(vcov(object)))
+  .saem_se(object)
 }
 
 
@@ -1371,14 +1270,6 @@ fit_zibbmr_taxa <- function(data, taxa, covariates = NULL,
   fits
 }
 
-.zibbmr_extract_loglik <- function(model) {
-  if (inherits(model, "zibbmr_saem")) {
-    return(model$loglik)
-  }
-
-  as.numeric(stats::logLik(model))
-}
-
 #' Prueba de razon de verosimilitudes entre dos ajustes ZIBBMR anidados
 #'
 #' Analogo de [lrt_zibr()] para modelos ZIBBMR.
@@ -1393,17 +1284,7 @@ fit_zibbmr_taxa <- function(data, taxa, covariates = NULL,
 #' @seealso [lrt_zibbmr_table()], [lrt_zibr()]
 #' @export
 lrt_zibbmr <- function(full, reduced, df = 2) {
-  ll_full <- .zibbmr_extract_loglik(full)
-  ll_reduced <- .zibbmr_extract_loglik(reduced)
-  statistic <- 2 * (ll_full - ll_reduced)
-
-  data.frame(
-    LL_full = ll_full,
-    LL_reduced = ll_reduced,
-    LRT = statistic,
-    df = df,
-    p_value = stats::pchisq(statistic, df = df, lower.tail = FALSE)
-  )
+  .saem_lrt(full, reduced, df = df)
 }
 
 #' Tabla de pruebas de razon de verosimilitudes para varios taxones ZIBBMR
@@ -1422,25 +1303,10 @@ lrt_zibbmr <- function(full, reduced, df = 2) {
 #' @export
 lrt_zibbmr_table <- function(full_models, reduced_models, species = names(full_models),
                              df = 2, alpha = 0.05) {
-  if (length(full_models) != length(reduced_models)) {
-    stop("full_models y reduced_models deben tener la misma longitud.", call. = FALSE)
-  }
-
-  if (is.null(species) || length(species) == 0) {
-    species <- seq_along(full_models)
-  }
-
-  out <- do.call(
-    rbind,
-    Map(function(full, reduced, sp) {
-      res <- lrt_zibbmr(full, reduced, df = df)
-      data.frame(Species = sp, res, row.names = NULL)
-    }, full_models, reduced_models, species)
+  .saem_lrt_table(
+    full_models, reduced_models,
+    species = species, df = df, alpha = alpha, lrt_fn = lrt_zibbmr
   )
-
-  out$Detected <- out$p_value < alpha
-  rownames(out) <- NULL
-  out
 }
 
 #' Tabla resumen de tres comparaciones LRT tipicas para ZIBBMR
@@ -1462,30 +1328,9 @@ zibbmr_results_table <- function(species,
                                  mod1_full, mod1_no_preg,
                                  mod2_full, mod2_no_preg, mod2_no_inter,
                                  df = 2, alpha = 0.05) {
-  LL1.0 <- vapply(mod1_full, .zibbmr_extract_loglik, numeric(1))
-  LL1.1 <- vapply(mod1_no_preg, .zibbmr_extract_loglik, numeric(1))
-  LL2.0 <- vapply(mod2_full, .zibbmr_extract_loglik, numeric(1))
-  LL2.1 <- vapply(mod2_no_preg, .zibbmr_extract_loglik, numeric(1))
-  LL2.2 <- vapply(mod2_no_inter, .zibbmr_extract_loglik, numeric(1))
-
-  pval_Preg1 <- stats::pchisq(2 * (LL1.0 - LL1.1), df = df, lower.tail = FALSE)
-  pval_Preg2 <- stats::pchisq(2 * (LL2.0 - LL2.1), df = df, lower.tail = FALSE)
-  pval_Inter <- stats::pchisq(2 * (LL2.0 - LL2.2), df = df, lower.tail = FALSE)
-
-  data.frame(
-    Species = species,
-    LL1.0 = LL1.0,
-    LL1.1 = LL1.1,
-    LL2.0 = LL2.0,
-    LL2.1 = LL2.1,
-    LL2.2 = LL2.2,
-    pval_Preg1 = pval_Preg1,
-    pval_Preg2 = pval_Preg2,
-    pval_Inter = pval_Inter,
-    Detec_Preg1 = pval_Preg1 < alpha,
-    Detec_Preg2 = pval_Preg2 < alpha,
-    Detec_Inter = pval_Inter < alpha,
-    row.names = NULL
+  .saem_results_table(
+    species, mod1_full, mod1_no_preg, mod2_full, mod2_no_preg, mod2_no_inter,
+    df = df, alpha = alpha
   )
 }
 
