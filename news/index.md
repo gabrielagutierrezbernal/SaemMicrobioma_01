@@ -89,3 +89,15 @@
   objetos genericos con metodo
   [`logLik()`](https://rdrr.io/r/stats/logLik.html) propio en
   [`lrt_zibr()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/lrt_zibr.md)/[`lrt_zibbmr()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/lrt_zibbmr.md).
+- [`ajustar_modelo_microbioma()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/ajustar_modelo_microbioma.md)/[`fit_saem_microbiome()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/ajustar_modelo_microbioma.md)
+  se robustecen para seguir el mismo patron que
+  [`fit_zibr_taxon()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/fit_zibr_taxon.md)/[`fit_zibbmr_taxon()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/fit_zibbmr_taxon.md):
+  admiten `x_covariables`/`z_covariables` por separado (antes forzaba
+  las mismas covariables en ambas partes del modelo), generan valores
+  iniciales aleatorios razonables cuando no se entregan (antes usaban
+  siempre los mismos valores fijos), exponen `compute_fim`, y validan
+  que `taxon`/`id`/ `total` existan en los datos. Se corrige ademas un
+  bug: con `zi = FALSE` se seguia armando la matriz `X`, lo que hacia
+  fallar el ajuste (
+  [`fit_zibr()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/fit_zibr.md)/[`fit_zibbmr()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/fit_zibbmr.md)
+  no aceptan `X` cuando `zi = FALSE`). Se amplian los tests de 85 a 93.

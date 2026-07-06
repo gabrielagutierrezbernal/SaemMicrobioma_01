@@ -232,24 +232,24 @@ fit_saem_microbiome(
 )
 #> ===== Resultados SAEM-ZIBR =====
 #> == Parte logistica: p_it ==
-#>             Estimate   Type
-#> Intercept -0.1352739 Random
-#> tiempo    23.8255787  Fixed
-#> grupo      3.3228070  Fixed
+#>              Estimate   Type
+#> Intercept  0.05587996 Random
+#> tiempo    20.25719954  Fixed
+#> grupo      3.06685819  Fixed
 #> == Parte beta: u_it ==
-#>             Estimate   Type
-#> Intercept -0.9723705 Random
-#> tiempo     0.1169677  Fixed
-#> grupo      0.1122245  Fixed
+#>              Estimate   Type
+#> Intercept -0.63237382 Random
+#> tiempo     0.01704677  Fixed
+#> grupo      0.03324855  Fixed
 #> === Varianzas de efectos aleatorios ===
 #> == Parte logistica ==
-#>             Variance sqrt.Var
-#> Intercept 0.04606087 0.214618
+#>              Variance   sqrt.Var
+#> Intercept 0.003020215 0.05495648
 #> == Parte beta ==
-#>             Variance  sqrt.Var
-#> Intercept 0.01725129 0.1313442
-#> === Phi: 4.322611
-#> === Log-verosimilitud marginal (importance sampling): 16.1801
+#>              Variance   sqrt.Var
+#> Intercept 0.004971694 0.07051024
+#> === Phi: 3.987447
+#> === Log-verosimilitud marginal (importance sampling): 14.64046
 ```
 
 ## Datos propios: preparar un dataset tipo Romero
