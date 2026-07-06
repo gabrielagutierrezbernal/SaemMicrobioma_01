@@ -38,3 +38,23 @@
   `ajustar_modelo_microbioma()`.
 * Se agrego el generico `se()` (antes `se.zibr_saem()`/`se.zibbmr_saem()`
   existian pero no eran invocables por faltar el generico).
+* Segunda pasada de optimizacion (2026-07-06): se consolidan en `R/utils.R`
+  once funciones mas que estaban duplicadas palabra por palabra entre
+  `zibr.R` y `zibbmr.R` (la formula de la parte de inflacion de ceros, la
+  comparacion de modelos por LRT, y los metodos `print`/`plot`/`logLik`/
+  `coef`/`vcov`/`se`). Las funciones publicas mantienen nombre, firma y
+  documentacion exactos. Verificado empiricamente que los resultados
+  numericos no cambian.
+* Se corrige `simular_datos_microbioma()` para que funcione con `n_taxa = 1`
+  (antes fallaba por una conversion implicita de data.frame a vector).
+* Se agrega `Remotes: nyiuab/NBZIMM` a `DESCRIPTION`, ya que `NBZIMM` no esta
+  en CRAN; esto era necesario para que la instalacion de dependencias en
+  CI (GitHub Actions) pudiera resolverlo.
+* Se agrega a John Barrera como colaborador (`ctb`) en `DESCRIPTION`, autor
+  original del metodo de estimacion SAEM para ZIBR y ZIBBMR.
+* Se amplia la cobertura de tests de 66 a 85 pruebas (cobertura de codigo
+  medida con `covr`: 83.8% -> 89.8%), agregando casos para `plot()`, los
+  errores de `vcov()` sin `compute_fim = TRUE`, `zibr_results_table()`/
+  `zibbmr_results_table()`, el caso `zi = FALSE` (sin inflacion de ceros) en
+  ambos modelos, y objetos genericos con metodo `logLik()` propio en
+  `lrt_zibr()`/`lrt_zibbmr()`.
