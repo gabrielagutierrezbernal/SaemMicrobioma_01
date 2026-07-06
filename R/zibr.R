@@ -2,75 +2,9 @@
 #### Base para desarrollo posterior de paquete R ####
 
 #### Utilidades internas ####
-
-.zibr_check_packages <- function(inference = TRUE) {
-  required <- "MASS"
-  if (inference) {
-    required <- c(required, "numDeriv")
-  }
-
-  missing <- required[!vapply(required, requireNamespace, logical(1), quietly = TRUE)]
-
-  if (length(missing) > 0) {
-    stop(
-      "Faltan paquetes requeridos: ",
-      paste(missing, collapse = ", "),
-      ". Instala antes de ajustar el modelo.",
-      call. = FALSE
-    )
-  }
-}
-
-.zibr_diag <- function(x) {
-  if (length(x) == 1) {
-    matrix(x, nrow = 1, ncol = 1)
-  } else {
-    diag(x)
-  }
-}
-
-.zibr_diag_inverse <- function(G) {
-  .zibr_diag(.zibr_diag(G)^-1)
-}
-
-.zibr_covariate_matrix <- function(x, n, prefix) {
-  if (is.null(x)) {
-    mat <- matrix(nrow = n, ncol = 0)
-  } else {
-    mat <- as.matrix(x)
-    if (nrow(mat) != n) {
-      stop("La matriz de covariables no tiene el mismo numero de filas que Y.", call. = FALSE)
-    }
-  }
-
-  if (ncol(mat) == 0) {
-    out <- matrix(1, nrow = n, ncol = 1)
-    colnames(out) <- "Intercept"
-    return(out)
-  }
-
-  if (is.null(colnames(mat))) {
-    colnames(mat) <- paste(prefix, seq_len(ncol(mat)), sep = ".")
-  }
-
-  cbind(Intercept = 1, mat)
-}
-
-.zibr_replicate_design <- function(design, n_chains) {
-  do.call("rbind", replicate(n_chains, design, simplify = FALSE))
-}
-
-.zibr_linear_prob <- function(psi, cols, id, design) {
-  psi_obs <- psi[id, cols, drop = FALSE]
-
-  if (length(cols) == 1) {
-    eta <- psi_obs[, 1] * design[, 1]
-  } else {
-    eta <- rowSums(psi_obs * design)
-  }
-
-  plogis(eta)
-}
+#### (.saem_check_packages, .saem_diag*, .saem_covariate_matrix, ####
+####  .saem_replicate_design, .saem_linear_prob viven en R/utils.R, ####
+####  compartidas con ZIBBMR) ####
 
 .zibr_validate_y <- function(y, zi, eps = 1e-6) {
   y <- as.numeric(y)
@@ -107,7 +41,7 @@
     nrow = n_rows
   )
 
-  p <- .zibr_linear_prob(psi_chain, seq_len(n_alpha), id_chain, x_design_chain)
+  p <- .saem_linear_prob(psi_chain, seq_len(n_alpha), id_chain, x_design_chain)
   loglik <- sum(log(1 - p[is_zero_chain])) + sum(log(p[is_positive_chain]))
 
   -loglik
@@ -131,7 +65,7 @@
     )
   }
 
-  u <- .zibr_linear_prob(
+  u <- .saem_linear_prob(
     psi_chain,
     n_alpha + seq_len(n_beta),
     id_chain,
@@ -161,7 +95,7 @@
     set.seed(seed)
   }
 
-  G_inv <- .zibr_diag_inverse(G)
+  G_inv <- .saem_diag_inverse(G)
   G_det <- prod(diag(G))
 
   psi_array <- array(rep(psi_mean, n_samples), dim = c(dim(psi_mean), n_samples))
@@ -172,7 +106,7 @@
   u_draws <- apply(
     psi_draws,
     3,
-    .zibr_linear_prob,
+    .saem_linear_prob,
     cols = n_alpha + seq_len(n_beta),
     id = id,
     design = z_design
@@ -182,7 +116,7 @@
     p_draws <- apply(
       psi_draws,
       3,
-      .zibr_linear_prob,
+      .saem_linear_prob,
       cols = seq_len(n_alpha),
       id = id,
       design = x_design
@@ -242,7 +176,7 @@
                                 is_positive_chain, is_zero_chain,
                                 n_alpha, n_beta, z_design_chain,
                                 y_chain, n_alpha_random, n_beta_random) {
-  G_diag <- .zibr_diag(G)
+  G_diag <- .saem_diag(G)
   n_rows <- nrow(psi_chain)
 
   if (zi) {
@@ -320,7 +254,7 @@
                                 is_positive_chain, is_zero_chain,
                                 n_alpha, n_beta, z_design_chain,
                                 y_chain, n_alpha_random, n_beta_random) {
-  G_diag <- .zibr_diag(G)
+  G_diag <- .saem_diag(G)
   n_rows <- nrow(psi_chain)
 
   if (zi) {
@@ -347,9 +281,9 @@
     )
 
   H[random_index, variance_index] <-
-    .zibr_diag(-1 / G_diag^2) %*% .zibr_diag(psi_sum - n_rows * mu[random_index])
+    .saem_diag(-1 / G_diag^2) %*% .saem_diag(psi_sum - n_rows * mu[random_index])
   H[variance_index, random_index] <-
-    .zibr_diag(-1 / G_diag^2) %*% .zibr_diag(psi_sum - n_rows * mu[random_index])
+    .saem_diag(-1 / G_diag^2) %*% .saem_diag(psi_sum - n_rows * mu[random_index])
 
   if (zi && n_alpha_random != n_alpha) {
     alpha_hess <- -numDeriv::hessian(
@@ -397,12 +331,78 @@
 
 #### Ajuste principal SAEM-ZIBR ####
 
+#' Ajustar un modelo ZIBR (zero-inflated beta regression) via SAEM
+#'
+#' Estima por Stochastic Approximation EM (SAEM) un modelo mixto de regresion
+#' beta con inflacion de ceros para una variable respuesta acotada en `[0, 1)`
+#' (por ejemplo, abundancia relativa de un taxon de microbioma), siguiendo el
+#' metodo descrito en Barrera (ZIBR: "A stochastic method to estimate a
+#' zero-inflated two-part mixed model for human microbiome data"). El modelo
+#' tiene dos partes: una logistica para la probabilidad de presencia
+#' (`X`/`alpha`) y una beta para la magnitud condicional a estar presente
+#' (`Z`/`beta`, `phi`), ambas con un intercepto aleatorio por sujeto.
+#'
+#' @param y Vector numerico de proporciones en `[0, 1)` (la respuesta).
+#' @param id Vector (o factor) que identifica al sujeto de cada observacion en
+#'   `y`. Debe tener la misma longitud que `y`.
+#' @param X Matriz o data frame de covariables para la parte de inflacion de
+#'   ceros (parte logistica). `NULL` si `zi = FALSE`.
+#' @param Z Matriz o data frame de covariables para la parte beta (magnitud
+#'   condicional). `NULL` equivale a solo intercepto.
+#' @param zi Logico. Si `TRUE` (por defecto) ajusta la parte de inflacion de
+#'   ceros; si `FALSE`, asume que `y` no tiene ceros estructurales.
+#' @param phi_start Valor inicial del parametro de dispersion `phi` de la
+#'   parte beta.
+#' @param alpha_start Vector de valores iniciales para los coeficientes de la
+#'   parte logistica (intercepto + columnas de `X`). Requerido si `zi = TRUE`.
+#' @param beta_start Vector de valores iniciales para los coeficientes de la
+#'   parte beta (intercepto + columnas de `Z`).
+#' @param n_iter Numero de iteraciones del algoritmo SAEM.
+#' @param n_chains Numero de cadenas MCMC paralelas usadas en el paso de
+#'   simulacion estocastica (S-step).
+#' @param seed Semilla aleatoria opcional.
+#' @param alpha_random Vector logico que indica que coeficientes de la parte
+#'   logistica son efectos aleatorios (por defecto, solo el intercepto).
+#' @param beta_random Vector logico que indica que coeficientes de la parte
+#'   beta son efectos aleatorios (por defecto, solo el intercepto).
+#' @param n_is Numero de muestras de importance sampling usadas para estimar
+#'   la log-verosimilitud marginal al final del ajuste.
+#' @param compute_fim Logico. Si `TRUE`, calcula la matriz de informacion de
+#'   Fisher estocastica (necesaria para `vcov()`/`se()`).
+#' @param eps Valor pequeno usado para evitar `log(0)` cuando `y` contiene
+#'   valores exactamente 0 (con `zi = FALSE`) o exactamente 1.
+#'
+#' @return Un objeto de clase `zibr_saem` (y `SAEM_ZIBR_result` por
+#'   compatibilidad), una lista con, entre otros, los elementos `mu` (alpha y
+#'   beta concatenados), `G` (varianza de efectos aleatorios), `phi`,
+#'   `loglik`, `trace` y `fisher_stoch`. Tiene metodos [print()], [plot()],
+#'   [stats::logLik()], [stats::coef()], [stats::vcov()] y [se()].
+#'
+#' @seealso [fit_zibr_taxon()] para ajustar directamente sobre una columna de
+#'   un data frame, [simulate_zibr_data()] para generar datos de prueba,
+#'   [lrt_zibr()] para comparar modelos anidados.
+#'
+#' @examples
+#' \donttest{
+#' dat <- simulate_zibr_data(
+#'   n_subjects = 20, n_time = 4, alpha = c(-0.3, 0.5), beta = c(0.2, -0.4),
+#'   sigma_alpha = 0.4, sigma_beta = 0.3, phi = 15,
+#'   X = matrix(rbinom(80, 1, 0.5)), Z = matrix(rbinom(80, 1, 0.5)), seed = 1
+#' )
+#' fit <- fit_zibr(
+#'   y = dat$Y, id = dat$Subject, X = dat$X.1, Z = dat$Z.1,
+#'   phi_start = 10, alpha_start = c(-0.2, 0.1), beta_start = c(0.1, 0.1),
+#'   n_iter = 50, seed = 1, compute_fim = FALSE
+#' )
+#' print(fit)
+#' }
+#' @export
 fit_zibr <- function(y, id, X = NULL, Z = NULL, zi = TRUE,
                      phi_start, alpha_start = NULL, beta_start,
                      n_iter = 500, n_chains = 5, seed = NULL,
                      alpha_random = NULL, beta_random = NULL,
                      n_is = 500, compute_fim = TRUE, eps = 1e-6) {
-  .zibr_check_packages(inference = compute_fim)
+  .saem_check_packages(inference = compute_fim)
 
   if (!is.null(seed)) {
     set.seed(seed)
@@ -419,7 +419,7 @@ fit_zibr <- function(y, id, X = NULL, Z = NULL, zi = TRUE,
   n_subjects <- length(unique(subject_id))
 
   if (zi) {
-    x_design <- .zibr_covariate_matrix(X, n_total, "X")
+    x_design <- .saem_covariate_matrix(X, n_total, "X")
     n_alpha <- ncol(x_design)
 
     if (length(alpha_start) != n_alpha) {
@@ -431,7 +431,7 @@ fit_zibr <- function(y, id, X = NULL, Z = NULL, zi = TRUE,
       stop("alpha_random debe tener longitud igual a length(alpha_start).", call. = FALSE)
     }
 
-    x_design_chain <- .zibr_replicate_design(x_design, n_chains)
+    x_design_chain <- .saem_replicate_design(x_design, n_chains)
     alpha_labels <- colnames(x_design)
     n_alpha_random <- sum(alpha_random)
   } else {
@@ -448,7 +448,7 @@ fit_zibr <- function(y, id, X = NULL, Z = NULL, zi = TRUE,
     n_alpha_random <- 0
   }
 
-  z_design <- .zibr_covariate_matrix(Z, n_total, "Z")
+  z_design <- .saem_covariate_matrix(Z, n_total, "Z")
   n_beta <- ncol(z_design)
 
   if (length(beta_start) != n_beta) {
@@ -462,7 +462,7 @@ fit_zibr <- function(y, id, X = NULL, Z = NULL, zi = TRUE,
 
   beta_labels <- colnames(z_design)
   n_beta_random <- sum(beta_random)
-  z_design_chain <- .zibr_replicate_design(z_design, n_chains)
+  z_design_chain <- .saem_replicate_design(z_design, n_chains)
 
   is_positive <- y != 0
   is_zero <- y == 0
@@ -479,7 +479,7 @@ fit_zibr <- function(y, id, X = NULL, Z = NULL, zi = TRUE,
   y_chain <- rep(y, n_chains)
 
   mu <- c(alpha_start, beta_start)
-  G_full <- 0.5 * .zibr_diag(abs(mu))
+  G_full <- 0.5 * .saem_diag(abs(mu))
   G <- as.matrix(G_full[random_index, random_index, drop = FALSE])
   phi <- phi_start
 
@@ -490,7 +490,7 @@ fit_zibr <- function(y, id, X = NULL, Z = NULL, zi = TRUE,
     byrow = TRUE
   )
 
-  u_chain <- .zibr_linear_prob(
+  u_chain <- .saem_linear_prob(
     psi_chain,
     n_alpha + seq_len(n_beta),
     id_chain,
@@ -498,7 +498,7 @@ fit_zibr <- function(y, id, X = NULL, Z = NULL, zi = TRUE,
   )
 
   if (zi) {
-    p_chain <- .zibr_linear_prob(psi_chain, seq_len(n_alpha), id_chain, x_design_chain)
+    p_chain <- .saem_linear_prob(psi_chain, seq_len(n_alpha), id_chain, x_design_chain)
   } else {
     p_chain <- u_chain / u_chain
   }
@@ -534,7 +534,7 @@ fit_zibr <- function(y, id, X = NULL, Z = NULL, zi = TRUE,
       byrow = TRUE
     )
 
-    G_inv <- .zibr_diag(diag(G)^-1)
+    G_inv <- .saem_diag(diag(G)^-1)
     log_ratio_data <- rep(0, n_chains * n_total)
 
     for (mh_iter in seq_len(4)) {
@@ -542,7 +542,7 @@ fit_zibr <- function(y, id, X = NULL, Z = NULL, zi = TRUE,
       psi_candidate[, -random_index] <- psi_chain[, -random_index]
 
       if (zi) {
-        p_candidate <- .zibr_linear_prob(
+        p_candidate <- .saem_linear_prob(
           psi_candidate,
           seq_len(n_alpha),
           id_chain,
@@ -554,7 +554,7 @@ fit_zibr <- function(y, id, X = NULL, Z = NULL, zi = TRUE,
         p_candidate <- p_chain
       }
 
-      u_candidate <- .zibr_linear_prob(
+      u_candidate <- .saem_linear_prob(
         psi_candidate,
         n_alpha + seq_len(n_beta),
         id_chain,
@@ -577,9 +577,9 @@ fit_zibr <- function(y, id, X = NULL, Z = NULL, zi = TRUE,
       psi_chain <- psi_candidate * accept + psi_chain * (!accept)
 
       if (zi) {
-        p_chain <- .zibr_linear_prob(psi_chain, seq_len(n_alpha), id_chain, x_design_chain)
+        p_chain <- .saem_linear_prob(psi_chain, seq_len(n_alpha), id_chain, x_design_chain)
       }
-      u_chain <- .zibr_linear_prob(psi_chain, n_alpha + seq_len(n_beta), id_chain, z_design_chain)
+      u_chain <- .saem_linear_prob(psi_chain, n_alpha + seq_len(n_beta), id_chain, z_design_chain)
     }
 
     accepted_uni <- proposed_uni <- rep(0, n_random)
@@ -600,7 +600,7 @@ fit_zibr <- function(y, id, X = NULL, Z = NULL, zi = TRUE,
       psi_candidate[, random_index] <- psi_chain[, random_index] + delta %*% proposal_sd_uni
 
       if (zi) {
-        p_candidate <- .zibr_linear_prob(
+        p_candidate <- .saem_linear_prob(
           psi_candidate,
           seq_len(n_alpha),
           id_chain,
@@ -612,7 +612,7 @@ fit_zibr <- function(y, id, X = NULL, Z = NULL, zi = TRUE,
         p_candidate <- p_chain
       }
 
-      u_candidate <- .zibr_linear_prob(
+      u_candidate <- .saem_linear_prob(
         psi_candidate,
         n_alpha + seq_len(n_beta),
         id_chain,
@@ -642,9 +642,9 @@ fit_zibr <- function(y, id, X = NULL, Z = NULL, zi = TRUE,
       psi_chain <- psi_candidate * accept + psi_chain * (!accept)
 
       if (zi) {
-        p_chain <- .zibr_linear_prob(psi_chain, seq_len(n_alpha), id_chain, x_design_chain)
+        p_chain <- .saem_linear_prob(psi_chain, seq_len(n_alpha), id_chain, x_design_chain)
       }
-      u_chain <- .zibr_linear_prob(psi_chain, n_alpha + seq_len(n_beta), id_chain, z_design_chain)
+      u_chain <- .saem_linear_prob(psi_chain, n_alpha + seq_len(n_beta), id_chain, z_design_chain)
 
       accepted_uni <- accepted_uni + colSums((delta * accept) != 0)
       proposed_uni <- proposed_uni + colSums(delta != 0)
@@ -664,7 +664,7 @@ fit_zibr <- function(y, id, X = NULL, Z = NULL, zi = TRUE,
         proposal_sd_multi
 
       if (zi) {
-        p_candidate <- .zibr_linear_prob(
+        p_candidate <- .saem_linear_prob(
           psi_candidate,
           seq_len(n_alpha),
           id_chain,
@@ -676,7 +676,7 @@ fit_zibr <- function(y, id, X = NULL, Z = NULL, zi = TRUE,
         p_candidate <- p_chain
       }
 
-      u_candidate <- .zibr_linear_prob(
+      u_candidate <- .saem_linear_prob(
         psi_candidate,
         n_alpha + seq_len(n_beta),
         id_chain,
@@ -706,9 +706,9 @@ fit_zibr <- function(y, id, X = NULL, Z = NULL, zi = TRUE,
       psi_chain <- psi_candidate * accept + psi_chain * (!accept)
 
       if (zi) {
-        p_chain <- .zibr_linear_prob(psi_chain, seq_len(n_alpha), id_chain, x_design_chain)
+        p_chain <- .saem_linear_prob(psi_chain, seq_len(n_alpha), id_chain, x_design_chain)
       }
-      u_chain <- .zibr_linear_prob(psi_chain, n_alpha + seq_len(n_beta), id_chain, z_design_chain)
+      u_chain <- .saem_linear_prob(psi_chain, n_alpha + seq_len(n_beta), id_chain, z_design_chain)
 
       accepted_multi <- accepted_multi + sum(accept)
     }
@@ -841,7 +841,7 @@ fit_zibr <- function(y, id, X = NULL, Z = NULL, zi = TRUE,
       }
     }
 
-    trace <- rbind(trace, c(mu, .zibr_diag(G), phi))
+    trace <- rbind(trace, c(mu, .saem_diag(G), phi))
 
     if (zi) {
       colnames(trace) <- c(
@@ -925,11 +925,48 @@ fit_zibr <- function(y, id, X = NULL, Z = NULL, zi = TRUE,
 
 #### Simulacion de datos ZIBR ####
 
+#' Simular datos longitudinales para un modelo ZIBR
+#'
+#' Genera un data frame de datos longitudinales compatibles con [fit_zibr()]:
+#' una respuesta continua acotada en `[0, 1]`, con inflacion de ceros
+#' opcional, efectos fijos y un intercepto (u otros coeficientes) aleatorios
+#' por sujeto con distribucion normal multivariada.
+#'
+#' @param n_subjects Numero de sujetos.
+#' @param n_time Numero de observaciones (tiempos) por sujeto.
+#' @param zi Logico. Si `TRUE` (por defecto), simula presencia/ausencia con un
+#'   modelo logistico (`X`/`alpha`) antes de simular la magnitud beta.
+#' @param X Matriz o data frame de covariables para la parte de inflacion de
+#'   ceros. `NULL` si `zi = FALSE`.
+#' @param Z Matriz o data frame de covariables para la parte beta.
+#' @param alpha Vector de coeficientes verdaderos de la parte logistica
+#'   (intercepto + columnas de `X`). Requerido si `zi = TRUE`.
+#' @param beta Vector de coeficientes verdaderos de la parte beta (intercepto
+#'   + columnas de `Z`).
+#' @param sigma_alpha Desviacion estandar del intercepto aleatorio de la parte
+#'   logistica. Requerido si `zi = TRUE`.
+#' @param sigma_beta Desviacion estandar del intercepto aleatorio de la parte
+#'   beta.
+#' @param phi Parametro de dispersion de la distribucion beta.
+#' @param seed Semilla aleatoria opcional.
+#'
+#' @return Un data frame con columnas `Subject`, `Time`, `Y` (la respuesta
+#'   simulada) y las covariables de `X`/`Z` usadas.
+#'
+#' @seealso [fit_zibr()]
+#' @examples
+#' dat <- simulate_zibr_data(
+#'   n_subjects = 10, n_time = 3, alpha = c(-0.3, 0.5), beta = c(0.2, -0.4),
+#'   sigma_alpha = 0.4, sigma_beta = 0.3, phi = 15,
+#'   X = matrix(rbinom(30, 1, 0.5)), Z = matrix(rbinom(30, 1, 0.5)), seed = 1
+#' )
+#' head(dat)
+#' @export
 simulate_zibr_data <- function(n_subjects, n_time, zi = TRUE,
                                X = NULL, Z = NULL, alpha = NULL, beta,
                                sigma_alpha = NULL, sigma_beta,
                                phi, seed = NULL) {
-  .zibr_check_packages(inference = FALSE)
+  .saem_check_packages(inference = FALSE)
 
   if (!is.null(seed)) {
     set.seed(seed)
@@ -938,7 +975,7 @@ simulate_zibr_data <- function(n_subjects, n_time, zi = TRUE,
   n_total <- n_subjects * n_time
 
   if (zi) {
-    x_design <- .zibr_covariate_matrix(X, n_total, "X")
+    x_design <- .saem_covariate_matrix(X, n_total, "X")
     n_alpha <- ncol(x_design)
 
     if (length(alpha) != n_alpha) {
@@ -956,7 +993,7 @@ simulate_zibr_data <- function(n_subjects, n_time, zi = TRUE,
     random_cols <- 1
   }
 
-  z_design <- .zibr_covariate_matrix(Z, n_total, "Z")
+  z_design <- .saem_covariate_matrix(Z, n_total, "Z")
   n_beta <- ncol(z_design)
 
   if (length(beta) != n_beta) {
@@ -967,9 +1004,9 @@ simulate_zibr_data <- function(n_subjects, n_time, zi = TRUE,
   mu <- c(alpha, beta)
 
   if (zi) {
-    G <- .zibr_diag(c(sigma_alpha^2, sigma_beta^2))
+    G <- .saem_diag(c(sigma_alpha^2, sigma_beta^2))
   } else {
-    G <- .zibr_diag(sigma_beta^2)
+    G <- .saem_diag(sigma_beta^2)
   }
 
   psi <- matrix(
@@ -981,10 +1018,10 @@ simulate_zibr_data <- function(n_subjects, n_time, zi = TRUE,
 
   psi[, random_cols] <- MASS::mvrnorm(n = n_subjects, mu = mu[random_cols], Sigma = G)
 
-  u <- .zibr_linear_prob(psi, n_alpha + seq_len(n_beta), id, z_design)
+  u <- .saem_linear_prob(psi, n_alpha + seq_len(n_beta), id, z_design)
 
   if (zi) {
-    p <- .zibr_linear_prob(psi, seq_len(n_alpha), id, x_design)
+    p <- .saem_linear_prob(psi, seq_len(n_alpha), id, x_design)
   } else {
     p <- u / u
   }
@@ -1013,6 +1050,12 @@ simulate_zibr_data <- function(n_subjects, n_time, zi = TRUE,
 
 #### Metodos basicos ####
 
+#' Imprimir un ajuste ZIBR
+#'
+#' @param x Un objeto `zibr_saem`, resultado de [fit_zibr()].
+#' @param ... No usado, por compatibilidad con el generico [print()].
+#' @return `x`, de forma invisible.
+#' @export
 print.zibr_saem <- function(x, ...) {
   cat("===== Resultados SAEM-ZIBR =====\n")
 
@@ -1072,6 +1115,17 @@ print.zibr_saem <- function(x, ...) {
   invisible(x)
 }
 
+#' Graficar la traza de convergencia de un ajuste ZIBR
+#'
+#' Dibuja la traza iteracion-a-iteracion de los parametros del modelo
+#' (`x$trace`), util para revisar visualmente la convergencia del algoritmo
+#' SAEM.
+#'
+#' @param x Un objeto `zibr_saem`, resultado de [fit_zibr()].
+#' @param ... No usado, por compatibilidad con el generico [plot()].
+#' @return `x`, de forma invisible. Se llama por su efecto secundario de
+#'   graficar.
+#' @export
 plot.zibr_saem <- function(x, ...) {
   trace <- x$trace
   n_iter <- nrow(trace)
@@ -1098,6 +1152,13 @@ plot.zibr_saem <- function(x, ...) {
   invisible(x)
 }
 
+#' Log-verosimilitud marginal de un ajuste ZIBR
+#'
+#' @param object Un objeto `zibr_saem`, resultado de [fit_zibr()].
+#' @param ... No usado, por compatibilidad con el generico [stats::logLik()].
+#' @return Un objeto `logLik` con la log-verosimilitud marginal estimada por
+#'   importance sampling, con atributos `df` (grados de libertad) y `nobs`.
+#' @export
 logLik.zibr_saem <- function(object, ...) {
   value <- object$loglik
   attr(value, "df") <- length(object$mu) + 1 + length(diag(object$G))
@@ -1106,10 +1167,26 @@ logLik.zibr_saem <- function(object, ...) {
   value
 }
 
+#' Coeficientes estimados de un ajuste ZIBR
+#'
+#' @param object Un objeto `zibr_saem`, resultado de [fit_zibr()].
+#' @param ... No usado, por compatibilidad con el generico [stats::coef()].
+#' @return Vector numerico `mu` con los coeficientes de la parte logistica
+#'   seguidos de los de la parte beta.
+#' @export
 coef.zibr_saem <- function(object, ...) {
   object$mu
 }
 
+#' Matriz de varianza-covarianza de un ajuste ZIBR
+#'
+#' Calcula la inversa de la matriz de informacion de Fisher estocastica
+#' (`fisher_stoch`), estimada durante el ajuste SAEM.
+#'
+#' @param object Un objeto `zibr_saem` ajustado con `compute_fim = TRUE`.
+#' @param ... No usado, por compatibilidad con el generico [stats::vcov()].
+#' @return Una matriz de varianza-covarianza.
+#' @export
 vcov.zibr_saem <- function(object, ...) {
   if (is.null(object$fisher_stoch)) {
     stop("El ajuste no contiene matriz FIM. Reajusta con compute_fim = TRUE.", call. = FALSE)
@@ -1118,13 +1195,52 @@ vcov.zibr_saem <- function(object, ...) {
   -solve(object$fisher_stoch)
 }
 
-se.zibr_saem <- function(object) {
+#' @rdname se
+#' @export
+se.zibr_saem <- function(object, ...) {
   sqrt(diag(vcov(object)))
 }
 
 
 #### Funciones limpias para analisis por taxon ####
 
+#' Ajustar ZIBR para un taxon de un data frame
+#'
+#' Envoltorio de [fit_zibr()] pensado para trabajar directamente sobre un
+#' data frame de microbioma en formato largo (una fila por sujeto-tiempo,
+#' una columna por taxon). Extrae la columna del taxon y las covariables por
+#' nombre, genera valores iniciales aleatorios razonables si no se entregan,
+#' y llama a [fit_zibr()].
+#'
+#' @param data Data frame con una fila por observacion, incluyendo la columna
+#'   del taxon, la columna de id y las covariables.
+#' @param taxon Nombre de la columna en `data` con la proporcion del taxon a
+#'   modelar.
+#' @param covariates Vector de nombres de columnas a usar como covariables
+#'   tanto en la parte logistica como en la parte beta. Se ignora si se
+#'   entregan `x_covariates`/`z_covariates` por separado.
+#' @param x_covariates Nombres de columnas para la parte de inflacion de
+#'   ceros (por defecto, igual a `covariates`).
+#' @param z_covariates Nombres de columnas para la parte beta (por defecto,
+#'   igual a `covariates`).
+#' @param id Nombre de la columna en `data` que identifica al sujeto.
+#' @param zi Logico, ver [fit_zibr()].
+#' @param phi_start Valor inicial de `phi`. Si es `NULL`, se sortea con
+#'   `runif(1, 10, 20)`.
+#' @param alpha_start Valores iniciales de la parte logistica. Si es `NULL`,
+#'   se sortean con `runif(., -0.1, 0.1)`.
+#' @param beta_start Valores iniciales de la parte beta. Si es `NULL`, se
+#'   sortean con `runif(., -0.1, 0.1)`.
+#' @param seed Semilla aleatoria, usada tanto para los valores iniciales como
+#'   para el ajuste SAEM.
+#' @param n_iter Numero de iteraciones SAEM.
+#' @param n_chains Numero de cadenas MCMC.
+#' @param compute_fim Logico, ver [fit_zibr()].
+#' @param ... Argumentos adicionales pasados a [fit_zibr()].
+#'
+#' @return Un objeto `zibr_saem`, igual que [fit_zibr()].
+#' @seealso [fit_zibr()], [fit_zibr_taxa()]
+#' @export
 fit_zibr_taxon <- function(data, taxon, covariates = NULL,
                            x_covariates = covariates,
                            z_covariates = covariates,
@@ -1190,6 +1306,25 @@ fit_zibr_taxon <- function(data, taxon, covariates = NULL,
   )
 }
 
+#' Ajustar ZIBR para varios taxones de un data frame
+#'
+#' Aplica [fit_zibr_taxon()] a cada elemento de `taxa`, con la misma
+#' configuracion de covariables e iteraciones para todos.
+#'
+#' @param data Data frame con una fila por observacion.
+#' @param taxa Vector de nombres de columnas (taxones) a ajustar.
+#' @param covariates,x_covariates,z_covariates Ver [fit_zibr_taxon()].
+#' @param id Nombre de la columna que identifica al sujeto.
+#' @param zi Logico, ver [fit_zibr()].
+#' @param seed Semilla aleatoria (se reutiliza para cada taxon).
+#' @param n_iter Numero de iteraciones SAEM.
+#' @param n_chains Numero de cadenas MCMC.
+#' @param compute_fim Logico, ver [fit_zibr()].
+#' @param ... Argumentos adicionales pasados a [fit_zibr_taxon()].
+#'
+#' @return Una lista de objetos `zibr_saem`, nombrada segun `taxa`.
+#' @seealso [fit_zibr_taxon()]
+#' @export
 fit_zibr_taxa <- function(data, taxa, covariates = NULL,
                           x_covariates = covariates,
                           z_covariates = covariates,
@@ -1224,6 +1359,22 @@ fit_zibr_taxa <- function(data, taxa, covariates = NULL,
   as.numeric(stats::logLik(model))
 }
 
+#' Prueba de razon de verosimilitudes entre dos ajustes ZIBR anidados
+#'
+#' Compara dos modelos ZIBR anidados (por ejemplo, con y sin una covariable)
+#' mediante un test de razon de verosimilitudes usando la log-verosimilitud
+#' marginal (importance sampling) de cada ajuste.
+#'
+#' @param full Modelo completo: un objeto `zibr_saem` o cualquier objeto con
+#'   metodo [stats::logLik()].
+#' @param reduced Modelo reducido (anidado en `full`), mismo tipo que `full`.
+#' @param df Grados de libertad de la prueba (numero de parametros extra en
+#'   `full` respecto a `reduced`).
+#'
+#' @return Un data frame de una fila con `LL_full`, `LL_reduced`, `LRT`
+#'   (estadistico), `df` y `p_value`.
+#' @seealso [lrt_zibr_table()]
+#' @export
 lrt_zibr <- function(full, reduced, df = 2) {
   ll_full <- .zibr_extract_loglik(full)
   ll_reduced <- .zibr_extract_loglik(reduced)
@@ -1238,6 +1389,24 @@ lrt_zibr <- function(full, reduced, df = 2) {
   )
 }
 
+#' Tabla de pruebas de razon de verosimilitudes para varios taxones ZIBR
+#'
+#' Aplica [lrt_zibr()] pareando cada elemento de `full_models` con el
+#' correspondiente en `reduced_models`, y arma una tabla con una fila por
+#' taxon.
+#'
+#' @param full_models Lista de modelos completos (uno por taxon).
+#' @param reduced_models Lista de modelos reducidos (uno por taxon, mismo
+#'   orden que `full_models`).
+#' @param species Vector de nombres/etiquetas para cada taxon (por defecto,
+#'   `names(full_models)`).
+#' @param df Grados de libertad de la prueba, ver [lrt_zibr()].
+#' @param alpha Nivel de significancia usado para marcar `Detected`.
+#'
+#' @return Un data frame con una fila por taxon: `Species`, las columnas de
+#'   [lrt_zibr()], y `Detected` (logico, `p_value < alpha`).
+#' @seealso [lrt_zibr()]
+#' @export
 lrt_zibr_table <- function(full_models, reduced_models, species = names(full_models),
                            df = 2, alpha = 0.05) {
   if (length(full_models) != length(reduced_models)) {
@@ -1261,6 +1430,25 @@ lrt_zibr_table <- function(full_models, reduced_models, species = names(full_mod
   out
 }
 
+#' Tabla resumen de tres comparaciones LRT tipicas para ZIBR
+#'
+#' Arma una tabla de resultados con dos pruebas de razon de verosimilitudes
+#' sobre un efecto principal (`mod1` vs. `mod2`, ej. embarazo) y una prueba de
+#' interaccion (`mod2` con y sin termino de interaccion), replicando el
+#' formato de reporte usado en el analisis de datos tipo Romero.
+#'
+#' @param species Vector de nombres/etiquetas para cada taxon.
+#' @param mod1_full,mod1_no_preg Listas de modelos ZIBR (con y sin el efecto
+#'   principal) para la primera comparacion, uno por taxon.
+#' @param mod2_full,mod2_no_preg,mod2_no_inter Listas de modelos ZIBR para la
+#'   segunda comparacion (efecto principal) y la prueba de interaccion, uno
+#'   por taxon.
+#' @param df Grados de libertad usados en las tres pruebas.
+#' @param alpha Nivel de significancia usado para las columnas `Detec_*`.
+#'
+#' @return Un data frame con una fila por taxon, con las log-verosimilitudes,
+#'   p-valores y detecciones de las tres comparaciones.
+#' @export
 zibr_results_table <- function(species,
                                mod1_full, mod1_no_preg,
                                mod2_full, mod2_no_preg, mod2_no_inter,
@@ -1295,6 +1483,28 @@ zibr_results_table <- function(species,
 
 #### Preparacion de datos Romero para ZIBR ####
 
+#' Preparar datos tipo Romero para ZIBR
+#'
+#' Toma una lista con datos de microbioma en el formato del estudio Romero
+#' (con elementos `SampleData` y `OTU`) y construye covariables estandar
+#' (tiempo de gestacion escalado, edad escalada, interaccion tiempo-embarazo)
+#' junto con abundancias relativas filtradas por proporcion de ceros, listas
+#' para usarse con [fit_zibr()]/[fit_zibr_taxon()].
+#'
+#' @param romero Una lista con elementos `SampleData` (covariables por
+#'   muestra, incluyendo `Age`, `Subect_ID`, `pregnant`, `GA_Days`,
+#'   `Total.Read.Counts`) y `OTU` (matriz o data frame de conteos por taxon,
+#'   mismo numero de filas que `SampleData`).
+#' @param taxa_out Indices de columnas de taxones a excluir explicitamente
+#'   tras el filtro por proporcion de ceros.
+#' @param zero_range Vector de largo 2 con el rango `[min, max]` de
+#'   proporcion de ceros permitido para retener un taxon.
+#'
+#' @return Una lista con `data` (covariables + abundancias relativas de los
+#'   taxones retenidos), `taxa` (nombres de esos taxones), `covariates`,
+#'   `abundances`, `taxa_removed` y `zero_range`.
+#' @seealso [prepare_romero_zibbmr()] para la version en conteos (ZIBBMR).
+#' @export
 prepare_romero_zibr <- function(romero, taxa_out = c(31, 49, 50, 60),
                                 zero_range = c(0.1, 0.9)) {
   if (!all(c("SampleData", "OTU") %in% names(romero))) {
@@ -1358,6 +1568,23 @@ prepare_romero_zibr <- function(romero, taxa_out = c(31, 49, 50, 60),
 
 #### Alias de compatibilidad con nombres del codigo original ####
 
+#' Alias historico de fit_zibr con la firma del codigo original de Barrera
+#'
+#' Envoltorio de compatibilidad hacia atras que expone [fit_zibr()] con los
+#' mismos nombres de argumento que el script original `saem_zibr()`
+#' (`jbarrera232/saem-zibr`). Se mantiene para no romper analisis existentes;
+#' el codigo nuevo deberia usar [fit_zibr()] directamente.
+#'
+#' @param Y,X,Z,index,zi,v0,a0,b0,seed,iter,ncad,a.fix,b.fix Ver los
+#'   argumentos equivalentes de [fit_zibr()]: `Y = y`, `index = id`,
+#'   `v0 = phi_start`, `a0 = alpha_start`, `b0 = beta_start`, `iter = n_iter`,
+#'   `ncad = n_chains`, `a.fix`/`b.fix` equivalen a `alpha_random`/
+#'   `beta_random` (`a.fix == 0` marca las posiciones aleatorias).
+#' @param compute_fim Ver [fit_zibr()].
+#'
+#' @return Un objeto `zibr_saem`, igual que [fit_zibr()].
+#' @seealso [fit_zibr()]
+#' @export
 saem_zibr_clean <- function(Y, X = NULL, Z = NULL, index, zi = TRUE,
                             v0, a0 = NULL, b0, seed, iter = 500, ncad = 5,
                             a.fix = NULL, b.fix = NULL, compute_fim = TRUE) {
@@ -1379,6 +1606,18 @@ saem_zibr_clean <- function(Y, X = NULL, Z = NULL, index, zi = TRUE,
   )
 }
 
+#' Alias historico de simulate_zibr_data con la firma del codigo original
+#'
+#' Envoltorio de compatibilidad hacia atras que expone [simulate_zibr_data()]
+#' con los nombres de argumento del script original de Barrera.
+#'
+#' @param n.ind,n.obs.ind,zi,X,Z,alpha,beta,s1,s2,v,seed Ver los argumentos
+#'   equivalentes de [simulate_zibr_data()]: `n.ind = n_subjects`,
+#'   `n.obs.ind = n_time`, `s1 = sigma_alpha`, `s2 = sigma_beta`, `v = phi`.
+#'
+#' @return Un data frame, igual que [simulate_zibr_data()].
+#' @seealso [simulate_zibr_data()]
+#' @export
 sim_zibr_data_clean <- function(n.ind, n.obs.ind, zi = TRUE,
                                 X = NULL, Z = NULL, alpha = NULL, beta,
                                 s1 = NULL, s2, v, seed) {
