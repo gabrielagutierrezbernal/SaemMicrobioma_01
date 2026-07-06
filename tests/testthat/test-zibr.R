@@ -124,6 +124,43 @@ test_that("metodos S3 de zibr_saem devuelven la estructura esperada", {
   # mal condicionado y producir NaN en algun se(); solo se prueba el tipo.
   expect_type(suppressWarnings(se(fit)), "double")
   expect_output(print(fit), "SAEM-ZIBR")
+
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off())
+  expect_no_error(plot(fit))
+})
+
+test_that("vcov.zibr_saem exige haber ajustado con compute_fim = TRUE", {
+  dat <- simulate_zibr_data(
+    n_subjects = 10, n_time = 3, alpha = c(-0.2, 0.3), beta = c(0.1, -0.2),
+    sigma_alpha = 0.3, sigma_beta = 0.2, phi = 12,
+    X = matrix(rbinom(30, 1, 0.5)), Z = matrix(rbinom(30, 1, 0.5)), seed = 3
+  )
+  fit <- fit_zibr(
+    y = dat$Y, id = dat$Subject, X = dat$X.1, Z = dat$Z.1,
+    phi_start = 10, alpha_start = c(-0.1, 0.1), beta_start = c(0.1, 0.1),
+    n_iter = 10, seed = 3, compute_fim = FALSE
+  )
+
+  expect_error(vcov(fit), "compute_fim = TRUE")
+})
+
+test_that("fit_zibr con zi = FALSE (sin inflacion de ceros) funciona", {
+  dat <- simulate_zibr_data(
+    n_subjects = 15, n_time = 4, zi = FALSE,
+    Z = matrix(rbinom(60, 1, 0.5)),
+    beta = c(0.2, -0.3), sigma_beta = 0.3, phi = 15, seed = 8
+  )
+
+  fit <- fit_zibr(
+    y = dat$Y, id = dat$Subject, Z = dat$Z.1, zi = FALSE,
+    phi_start = 10, beta_start = c(0.1, 0.1),
+    n_iter = 30, seed = 8, compute_fim = FALSE
+  )
+
+  expect_s3_class(fit, "zibr_saem")
+  expect_length(coef(fit), 2)
+  expect_output(print(fit), "SAEM-ZIBR")
 })
 
 test_that("fit_zibr valida dimensiones y rango de Y", {

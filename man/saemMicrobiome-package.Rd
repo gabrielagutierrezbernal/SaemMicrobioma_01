@@ -36,5 +36,10 @@ Authors:
   \item Gabriela Gutierrez \email{gabriella.gutierrez.bernal@gmail.com}
 }
 
+Other contributors:
+\itemize{
+  \item John Barrera (Autor original del metodo de estimacion SAEM para ZIBR y ZIBBMR) [contributor]
+}
+
 }
 \keyword{internal}

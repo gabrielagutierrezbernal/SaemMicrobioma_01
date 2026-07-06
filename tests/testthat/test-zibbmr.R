@@ -93,6 +93,45 @@ test_that("metodos S3 de zibbmr_saem devuelven la estructura esperada", {
   # mal condicionado y producir NaN en algun se(); solo se prueba el tipo.
   expect_type(suppressWarnings(se(fit)), "double")
   expect_output(print(fit), "SAEM-ZIBBMR")
+
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off())
+  expect_no_error(plot(fit))
+})
+
+test_that("vcov.zibbmr_saem exige haber ajustado con compute_fim = TRUE", {
+  S <- rep(500, 30)
+  dat <- simulate_zibbmr_data(
+    n_subjects = 10, n_time = 3, S = S, alpha = c(-0.2, 0.3), beta = c(0.1, -0.2),
+    sigma_alpha = 0.3, sigma_beta = 0.2, phi = 12,
+    X = matrix(rbinom(30, 1, 0.5)), Z = matrix(rbinom(30, 1, 0.5)), seed = 3
+  )
+  fit <- fit_zibbmr(
+    y = dat$Y, S = S, id = dat$Subject, X = dat$X.1, Z = dat$Z.1,
+    phi_start = 10, alpha_start = c(-0.1, 0.1), beta_start = c(0.1, 0.1),
+    n_iter = 10, seed = 3, compute_fim = FALSE
+  )
+
+  expect_error(vcov(fit), "compute_fim = TRUE")
+})
+
+test_that("fit_zibbmr con zi = FALSE (sin inflacion de ceros) funciona", {
+  S <- rep(500, 60)
+  dat <- simulate_zibbmr_data(
+    n_subjects = 15, n_time = 4, S = S, zi = FALSE,
+    Z = matrix(rbinom(60, 1, 0.5)),
+    beta = c(0.2, -0.3), sigma_beta = 0.3, phi = 15, seed = 8
+  )
+
+  fit <- fit_zibbmr(
+    y = dat$Y, S = S, id = dat$Subject, Z = dat$Z.1, zi = FALSE,
+    phi_start = 10, beta_start = c(0.1, 0.1),
+    n_iter = 30, seed = 8, compute_fim = FALSE
+  )
+
+  expect_s3_class(fit, "zibbmr_saem")
+  expect_length(coef(fit), 2)
+  expect_output(print(fit), "SAEM-ZIBBMR")
 })
 
 test_that("fit_zibbmr valida 0 <= y <= S y longitudes", {

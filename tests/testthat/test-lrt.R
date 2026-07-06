@@ -45,3 +45,50 @@ test_that("lrt_zibr_table exige listas de la misma longitud", {
     "misma longitud"
   )
 })
+
+test_that("lrt_zibr acepta cualquier objeto con metodo logLik() (no solo zibr_saem)", {
+  full <- lm(mpg ~ wt, data = mtcars)
+  reduced <- mock_fit(as.numeric(stats::logLik(full)) - 5, "zibr_saem")
+
+  res <- lrt_zibr(full, reduced, df = 1)
+
+  expect_equal(res$LL_full, as.numeric(stats::logLik(full)))
+  expect_equal(res$LRT, 2 * 5)
+})
+
+test_that("zibr_results_table arma las tres comparaciones LRT", {
+  species <- c("sp1", "sp2")
+
+  tab <- zibr_results_table(
+    species = species,
+    mod1_full = list(mock_fit(-90, "zibr_saem"), mock_fit(-40, "zibr_saem")),
+    mod1_no_preg = list(mock_fit(-100, "zibr_saem"), mock_fit(-40.001, "zibr_saem")),
+    mod2_full = list(mock_fit(-90, "zibr_saem"), mock_fit(-40, "zibr_saem")),
+    mod2_no_preg = list(mock_fit(-100, "zibr_saem"), mock_fit(-40.001, "zibr_saem")),
+    mod2_no_inter = list(mock_fit(-100, "zibr_saem"), mock_fit(-40.001, "zibr_saem")),
+    df = 2, alpha = 0.05
+  )
+
+  expect_equal(nrow(tab), 2)
+  expect_equal(tab$Species, species)
+  expect_true(tab$Detec_Preg1[1])
+  expect_false(tab$Detec_Preg1[2])
+})
+
+test_that("zibbmr_results_table arma las tres comparaciones LRT", {
+  species <- c("sp1", "sp2")
+
+  tab <- zibbmr_results_table(
+    species = species,
+    mod1_full = list(mock_fit(-90, "zibbmr_saem"), mock_fit(-40, "zibbmr_saem")),
+    mod1_no_preg = list(mock_fit(-100, "zibbmr_saem"), mock_fit(-40.001, "zibbmr_saem")),
+    mod2_full = list(mock_fit(-90, "zibbmr_saem"), mock_fit(-40, "zibbmr_saem")),
+    mod2_no_preg = list(mock_fit(-100, "zibbmr_saem"), mock_fit(-40.001, "zibbmr_saem")),
+    mod2_no_inter = list(mock_fit(-100, "zibbmr_saem"), mock_fit(-40.001, "zibbmr_saem")),
+    df = 2, alpha = 0.05
+  )
+
+  expect_equal(nrow(tab), 2)
+  expect_true(tab$Detec_Preg1[1])
+  expect_false(tab$Detec_Preg1[2])
+})
