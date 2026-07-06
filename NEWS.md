@@ -58,3 +58,13 @@
   `zibbmr_results_table()`, el caso `zi = FALSE` (sin inflacion de ceros) en
   ambos modelos, y objetos genericos con metodo `logLik()` propio en
   `lrt_zibr()`/`lrt_zibbmr()`.
+* `ajustar_modelo_microbioma()`/`fit_saem_microbiome()` se robustecen para
+  seguir el mismo patron que `fit_zibr_taxon()`/`fit_zibbmr_taxon()`:
+  admiten `x_covariables`/`z_covariables` por separado (antes forzaba las
+  mismas covariables en ambas partes del modelo), generan valores iniciales
+  aleatorios razonables cuando no se entregan (antes usaban siempre los
+  mismos valores fijos), exponen `compute_fim`, y validan que `taxon`/`id`/
+  `total` existan en los datos. Se corrige ademas un bug: con `zi = FALSE`
+  se seguia armando la matriz `X`, lo que hacia fallar el ajuste (
+  `fit_zibr()`/`fit_zibbmr()` no aceptan `X` cuando `zi = FALSE`). Se
+  amplian los tests de 85 a 93.

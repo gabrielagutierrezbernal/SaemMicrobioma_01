@@ -12,9 +12,15 @@ ajustar_modelo_microbioma(
   id = "id",
   total = "N",
   covariables = c("tiempo", "grupo"),
+  x_covariables = covariables,
+  z_covariables = covariables,
   zi = TRUE,
+  phi_start = NULL,
+  alpha_start = NULL,
+  beta_start = NULL,
   iter = 200,
   ncad = 5,
+  compute_fim = FALSE,
   seed = 1
 )
 
@@ -25,9 +31,15 @@ fit_saem_microbiome(
   id = "id",
   total = "N",
   covariables = c("tiempo", "grupo"),
+  x_covariables = covariables,
+  z_covariables = covariables,
   zi = TRUE,
+  phi_start = NULL,
+  alpha_start = NULL,
+  beta_start = NULL,
   iter = 200,
   ncad = 5,
+  compute_fim = FALSE,
   seed = 1
 )
 }
@@ -46,16 +58,37 @@ proporcion, segun \code{modelo}) a modelar.}
 Solo se usa si \code{modelo = "zibbmr"}.}
 
 \item{covariables}{Vector de nombres de columnas en \code{datos} a usar como
-covariables, tanto en la parte logistica como en la parte
-beta/beta-binomial.}
+covariables tanto en la parte logistica como en la parte
+beta/beta-binomial. Se ignora si se entregan \code{x_covariables}/
+\code{z_covariables} por separado.}
+
+\item{x_covariables}{Nombres de columnas para la parte de inflacion de
+ceros (por defecto, igual a \code{covariables}).}
+
+\item{z_covariables}{Nombres de columnas para la parte beta/beta-binomial
+(por defecto, igual a \code{covariables}).}
 
 \item{zi}{Logico, ver \code{\link[=fit_zibr]{fit_zibr()}}/\code{\link[=fit_zibbmr]{fit_zibbmr()}}.}
+
+\item{phi_start}{Valor inicial de dispersion. Si es \code{NULL} (por defecto),
+se sortea con \code{runif(1, 10, 20)}.}
+
+\item{alpha_start}{Valores iniciales de la parte logistica. Si es \code{NULL}
+(por defecto), se sortean con \code{runif(., -0.1, 0.1)}. Se ignora si
+\code{zi = FALSE}.}
+
+\item{beta_start}{Valores iniciales de la parte beta/beta-binomial. Si es
+\code{NULL} (por defecto), se sortean con \code{runif(., -0.1, 0.1)}.}
 
 \item{iter}{Numero de iteraciones SAEM.}
 
 \item{ncad}{Numero de cadenas MCMC.}
 
-\item{seed}{Semilla aleatoria.}
+\item{compute_fim}{Logico. Si \code{TRUE}, calcula la matriz de informacion de
+Fisher estocastica (necesaria para \code{vcov()}/\code{se()}).}
+
+\item{seed}{Semilla aleatoria, usada tanto para los valores iniciales
+(cuando se sortean) como para el ajuste SAEM.}
 }
 \value{
 Un objeto \code{zibr_saem} o \code{zibbmr_saem}, segun \code{modelo}.
@@ -64,9 +97,11 @@ Un objeto \code{zibr_saem} o \code{zibbmr_saem}, segun \code{modelo}.
 Funcion "madre" que despacha a \code{\link[=saem_zibr_clean]{saem_zibr_clean()}} o \code{\link[=saem_zibbmr_clean]{saem_zibbmr_clean()}}
 segun \code{modelo}, extrayendo la respuesta, el total de lecturas (si aplica)
 y las covariables directamente de un data frame por nombre de columna, y
-generando valores iniciales por defecto razonables. Pensada para ajustar
-rapidamente un taxon sin tener que armar a mano las matrices \code{X}/\code{Z} y los
-vectores de valores iniciales que piden \code{\link[=fit_zibr]{fit_zibr()}}/\code{\link[=fit_zibbmr]{fit_zibbmr()}}.
+generando valores iniciales por defecto razonables si no se entregan.
+Pensada para ajustar rapidamente un taxon sin tener que armar a mano las
+matrices \code{X}/\code{Z} y los vectores de valores iniciales que piden
+\code{\link[=fit_zibr]{fit_zibr()}}/\code{\link[=fit_zibbmr]{fit_zibbmr()}}. Sigue el mismo patron que
+\code{\link[=fit_zibr_taxon]{fit_zibr_taxon()}}/\code{\link[=fit_zibbmr_taxon]{fit_zibbmr_taxon()}}.
 }
 \details{
 \code{fit_saem_microbiome()} es un alias identico, con un nombre que sigue la
@@ -74,6 +109,5 @@ convencion \verb{fit_*} del resto del paquete.
 }
 \seealso{
 \code{\link[=fit_zibr_taxon]{fit_zibr_taxon()}}, \code{\link[=fit_zibbmr_taxon]{fit_zibbmr_taxon()}} para envoltorios
-equivalentes con la firma de argumentos moderna (\code{n_iter}, \code{n_chains},
-\code{x_covariates}/\code{z_covariates} separados).
+equivalentes con la firma de argumentos moderna (\code{n_iter}, \code{n_chains}).
 }
