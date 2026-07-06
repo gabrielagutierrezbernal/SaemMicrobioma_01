@@ -62,3 +62,30 @@
   (antes
   [`se.zibr_saem()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/se.md)/[`se.zibbmr_saem()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/se.md)
   existian pero no eran invocables por faltar el generico).
+- Segunda pasada de optimizacion (2026-07-06): se consolidan en
+  `R/utils.R` once funciones mas que estaban duplicadas palabra por
+  palabra entre `zibr.R` y `zibbmr.R` (la formula de la parte de
+  inflacion de ceros, la comparacion de modelos por LRT, y los metodos
+  `print`/`plot`/`logLik`/ `coef`/`vcov`/`se`). Las funciones publicas
+  mantienen nombre, firma y documentacion exactos. Verificado
+  empiricamente que los resultados numericos no cambian.
+- Se corrige
+  [`simular_datos_microbioma()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/simular_datos_microbioma.md)
+  para que funcione con `n_taxa = 1` (antes fallaba por una conversion
+  implicita de data.frame a vector).
+- Se agrega `Remotes: nyiuab/NBZIMM` a `DESCRIPTION`, ya que `NBZIMM` no
+  esta en CRAN; esto era necesario para que la instalacion de
+  dependencias en CI (GitHub Actions) pudiera resolverlo.
+- Se agrega a John Barrera como colaborador (`ctb`) en `DESCRIPTION`,
+  autor original del metodo de estimacion SAEM para ZIBR y ZIBBMR.
+- Se amplia la cobertura de tests de 66 a 85 pruebas (cobertura de
+  codigo medida con `covr`: 83.8% -\> 89.8%), agregando casos para
+  [`plot()`](https://rdrr.io/r/graphics/plot.default.html), los errores
+  de [`vcov()`](https://rdrr.io/r/stats/vcov.html) sin
+  `compute_fim = TRUE`,
+  [`zibr_results_table()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/zibr_results_table.md)/
+  [`zibbmr_results_table()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/zibbmr_results_table.md),
+  el caso `zi = FALSE` (sin inflacion de ceros) en ambos modelos, y
+  objetos genericos con metodo
+  [`logLik()`](https://rdrr.io/r/stats/logLik.html) propio en
+  [`lrt_zibr()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/lrt_zibr.md)/[`lrt_zibbmr()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/lrt_zibbmr.md).

@@ -33,3 +33,8 @@ Useful links:
 Authors:
 
 - Gabriela Gutierrez <gabriella.gutierrez.bernal@gmail.com>
+
+Other contributors:
+
+- John Barrera (Autor original del metodo de estimacion SAEM para ZIBR y
+  ZIBBMR) \[contributor\]

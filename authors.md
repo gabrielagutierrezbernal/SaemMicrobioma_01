@@ -4,6 +4,9 @@
 
 - **Gabriela Gutierrez**. Author, maintainer.
 
+- **John Barrera**. Contributor.  
+  Autor original del metodo de estimacion SAEM para ZIBR y ZIBBMR
+
 ## Citation
 
 Source:
