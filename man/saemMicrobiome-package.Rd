@@ -23,8 +23,8 @@ siguiendo la metodologia desarrollada por John Barrera.
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/gabrielagutierrezbernal/saemMicrobiome_01}
-  \item Report bugs at \url{https://github.com/gabrielagutierrezbernal/saemMicrobiome_01/issues}
+  \item \url{https://github.com/gabrielagutierrezbernal/SaemMicrobioma_01}
+  \item Report bugs at \url{https://github.com/gabrielagutierrezbernal/SaemMicrobioma_01/issues}
 }
 
 }

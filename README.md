@@ -3,7 +3,7 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/gabrielagutierrezbernal/saemMicrobiome_01/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/gabrielagutierrezbernal/saemMicrobiome_01/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/gabrielagutierrezbernal/SaemMicrobioma_01/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/gabrielagutierrezbernal/SaemMicrobioma_01/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 `saemMicrobiome` implementa dos modelos mixtos con inflacion de ceros
@@ -28,7 +28,7 @@ general en analisis de microbioma longitudinal.
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("gabrielagutierrezbernal/saemMicrobiome_01")
+remotes::install_github("gabrielagutierrezbernal/SaemMicrobioma_01")
 ```
 
 ## Ejemplo: ZIBR (proporciones)
