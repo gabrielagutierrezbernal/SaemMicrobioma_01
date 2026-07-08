@@ -108,7 +108,7 @@
       phi * (1 - u_draws[is_positive, ])
     )
 
-  P1 <- apply(log_y_given_psi, 2, function(x) tapply(x, id, sum))
+  P1 <- rowsum(log_y_given_psi, id)
 
   mu_random <- matrix(rep(mu[random_index], n_samples), ncol = n_samples)
   random_draws <- array(
@@ -452,6 +452,12 @@ fit_zibbmr <- function(y, S, id, X = NULL, Z = NULL, zi = TRUE,
   id_rep <- rep(subject_id, n_chains)
   id_chain <- id_rep + n_subjects * (rep(seq_len(n_chains), each = n_total) - 1)
 
+  # Grupo sujeto para colapsar las filas (sujeto, cadena) de psi_chain sobre
+  # las cadenas; cada sujeto aparece exactamente n_chains veces, asi que la
+  # media por sujeto es rowsum(.)/n_chains (equivalente a tapply(., mean) pero
+  # sin reconstruir el factor en cada iteracion).
+  subject_group_chain <- rep(seq_len(n_subjects), n_chains)
+
   is_positive_chain <- rep(is_positive, n_chains)
   is_zero_chain <- rep(is_zero, n_chains)
   y_chain <- rep(y, n_chains)
@@ -495,8 +501,8 @@ fit_zibbmr <- function(y, S, id, X = NULL, Z = NULL, zi = TRUE,
     fisher_stoch <- NULL
   }
 
-  psi_subject_mean <- apply(psi_chain, 2, function(x) tapply(x, rep(seq_len(n_subjects), n_chains), mean))
-  psi_subject_second <- apply(psi_chain^2, 2, function(x) tapply(x, rep(seq_len(n_subjects), n_chains), mean))
+  psi_subject_mean <- rowsum(psi_chain, subject_group_chain) / n_chains
+  psi_subject_second <- rowsum(psi_chain^2, subject_group_chain) / n_chains
 
   stat1 <- n_subjects * mu
   stat2 <- G_full
@@ -554,7 +560,7 @@ fit_zibbmr <- function(y, S, id, X = NULL, Z = NULL, zi = TRUE,
         lgamma(phi * u_chain[is_positive_chain]) -
         lgamma(phi * (1 - u_chain[is_positive_chain]))
 
-      subject_log_ratio <- as.vector(tapply(log_ratio_data, id_chain, sum))
+      subject_log_ratio <- as.vector(rowsum(log_ratio_data, id_chain))
       accept <- subject_log_ratio < -log(runif(n_subjects * n_chains))
 
       psi_chain <- psi_candidate * accept + psi_chain * (!accept)
@@ -618,10 +624,10 @@ fit_zibbmr <- function(y, S, id, X = NULL, Z = NULL, zi = TRUE,
       d_candidate <- psi_candidate[, random_index, drop = FALSE] - mu_chain[, random_index, drop = FALSE]
       d_current <- psi_chain[, random_index, drop = FALSE] - mu_chain[, random_index, drop = FALSE]
 
-      subject_log_ratio <- as.vector(tapply(log_ratio_data, id_chain, sum)) +
+      subject_log_ratio <- as.vector(rowsum(log_ratio_data, id_chain)) +
         0.5 * (
-          diag(d_candidate %*% G_inv %*% t(d_candidate)) -
-            diag(d_current %*% G_inv %*% t(d_current))
+          rowSums((d_candidate %*% G_inv) * d_candidate) -
+            rowSums((d_current %*% G_inv) * d_current)
         )
 
       accept <- subject_log_ratio < -log(runif(n_subjects * n_chains))
@@ -685,10 +691,10 @@ fit_zibbmr <- function(y, S, id, X = NULL, Z = NULL, zi = TRUE,
       d_candidate <- psi_candidate[, random_index, drop = FALSE] - mu_chain[, random_index, drop = FALSE]
       d_current <- psi_chain[, random_index, drop = FALSE] - mu_chain[, random_index, drop = FALSE]
 
-      subject_log_ratio <- as.vector(tapply(log_ratio_data, id_chain, sum)) +
+      subject_log_ratio <- as.vector(rowsum(log_ratio_data, id_chain)) +
         0.5 * (
-          diag(d_candidate %*% G_inv %*% t(d_candidate)) -
-            diag(d_current %*% G_inv %*% t(d_current))
+          rowSums((d_candidate %*% G_inv) * d_candidate) -
+            rowSums((d_current %*% G_inv) * d_current)
         )
 
       accept <- subject_log_ratio < -log(runif(n_subjects * n_chains))
@@ -708,13 +714,13 @@ fit_zibbmr <- function(y, S, id, X = NULL, Z = NULL, zi = TRUE,
 
     psi_subject_mean <- psi_subject_mean +
       gamma * (
-        apply(psi_chain, 2, function(x) tapply(x, rep(seq_len(n_subjects), n_chains), mean)) -
+        rowsum(psi_chain, subject_group_chain) / n_chains -
           psi_subject_mean
       )
 
     psi_subject_second <- psi_subject_second +
       gamma * (
-        apply(psi_chain^2, 2, function(x) tapply(x, rep(seq_len(n_subjects), n_chains), mean)) -
+        rowsum(psi_chain^2, subject_group_chain) / n_chains -
           psi_subject_second
       )
 
@@ -850,7 +856,7 @@ fit_zibbmr <- function(y, S, id, X = NULL, Z = NULL, zi = TRUE,
     }
   }
 
-  psi_mean <- apply(psi_chain, 2, function(x) tapply(x, rep(seq_len(n_subjects), n_chains), mean))
+  psi_mean <- rowsum(psi_chain, subject_group_chain) / n_chains
   psi_var <- psi_subject_second - psi_subject_mean^2
   psi_var[, -random_index] <- 0
 
