@@ -47,6 +47,10 @@
 <li>Se agrega <code>Remotes: nyiuab/NBZIMM</code> a <code>DESCRIPTION</code>, ya que <code>NBZIMM</code> no esta en CRAN; esto era necesario para que la instalacion de dependencias en CI (GitHub Actions) pudiera resolverlo.</li>
 <li>Se agrega a John Barrera como colaborador (<code>ctb</code>) en <code>DESCRIPTION</code>, autor original del metodo de estimacion SAEM para ZIBR y ZIBBMR.</li>
 <li>Se amplia la cobertura de tests de 66 a 85 pruebas (cobertura de codigo medida con <code>covr</code>: 83.8% -&gt; 89.8%), agregando casos para <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>, los errores de <code><a href="https://rdrr.io/r/stats/vcov.html" class="external-link">vcov()</a></code> sin <code>compute_fim = TRUE</code>, <code><a href="../reference/zibr_results_table.html">zibr_results_table()</a></code>/ <code><a href="../reference/zibbmr_results_table.html">zibbmr_results_table()</a></code>, el caso <code>zi = FALSE</code> (sin inflacion de ceros) en ambos modelos, y objetos genericos con metodo <code><a href="https://rdrr.io/r/stats/logLik.html" class="external-link">logLik()</a></code> propio en <code><a href="../reference/lrt_zibr.html">lrt_zibr()</a></code>/<code><a href="../reference/lrt_zibbmr.html">lrt_zibbmr()</a></code>.</li>
+<li>Optimizacion de rendimiento en R puro del motor SAEM (fase 1), sin cambiar la logica estadistica: los resultados numericos son byte-identicos antes y despues (verificado con semilla fija en ZIBR y ZIBBMR). Cambios:
+<ol style="list-style-type: lower-alpha"><li>en el loop MCMC, <code>tapply(., id_chain, sum)</code> -&gt; <code>rowsum(., id_chain)</code> y <code>apply(., 2, function(x) tapply(x, grupo, mean))</code> -&gt; <code>rowsum(., grupo)/n_chains</code>, evitando reconstruir el factor de agrupamiento en cada iteracion;</li>
+<li>las formas cuadraticas <code>diag(d %*% G_inv %*% t(d))</code>, que construian una matriz (n_subjects<em>n_chains) x (n_subjects</em>n_chains) completa solo para quedarse con la diagonal, se reemplazan por la identidad equivalente <code>rowSums((d %*% G_inv) * d)</code>. Resultado: ~3.4x mas rapido en un ajuste de 150 sujetos x 300 iteraciones (de ~23s a ~7s), y proporcionalmente en casos mas chicos.</li>
+</ol></li>
 <li>
 <code><a href="../reference/ajustar_modelo_microbioma.html">ajustar_modelo_microbioma()</a></code>/<code><a href="../reference/ajustar_modelo_microbioma.html">fit_saem_microbiome()</a></code> se robustecen para seguir el mismo patron que <code><a href="../reference/fit_zibr_taxon.html">fit_zibr_taxon()</a></code>/<code><a href="../reference/fit_zibbmr_taxon.html">fit_zibbmr_taxon()</a></code>: admiten <code>x_covariables</code>/<code>z_covariables</code> por separado (antes forzaba las mismas covariables en ambas partes del modelo), generan valores iniciales aleatorios razonables cuando no se entregan (antes usaban siempre los mismos valores fijos), exponen <code>compute_fim</code>, y validan que <code>taxon</code>/<code>id</code>/ <code>total</code> existan en los datos. Se corrige ademas un bug: con <code>zi = FALSE</code> se seguia armando la matriz <code>X</code>, lo que hacia fallar el ajuste ( <code><a href="../reference/fit_zibr.html">fit_zibr()</a></code>/<code><a href="../reference/fit_zibbmr.html">fit_zibbmr()</a></code> no aceptan <code>X</code> cuando <code>zi = FALSE</code>). Se amplian los tests de 85 a 93.</li>
 </ul></div>
@@ -58,7 +62,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer></div>

@@ -89,6 +89,22 @@
   objetos genericos con metodo
   [`logLik()`](https://rdrr.io/r/stats/logLik.html) propio en
   [`lrt_zibr()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/lrt_zibr.md)/[`lrt_zibbmr()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/lrt_zibbmr.md).
+- Optimizacion de rendimiento en R puro del motor SAEM (fase 1), sin
+  cambiar la logica estadistica: los resultados numericos son
+  byte-identicos antes y despues (verificado con semilla fija en ZIBR y
+  ZIBBMR). Cambios:
+  1.  en el loop MCMC, `tapply(., id_chain, sum)` -\>
+      `rowsum(., id_chain)` y
+      `apply(., 2, function(x) tapply(x, grupo, mean))` -\>
+      `rowsum(., grupo)/n_chains`, evitando reconstruir el factor de
+      agrupamiento en cada iteracion;
+  2.  las formas cuadraticas `diag(d %*% G_inv %*% t(d))`, que
+      construian una matriz (n_subjects*n_chains) x
+      (n_subjects*n_chains) completa solo para quedarse con la diagonal,
+      se reemplazan por la identidad equivalente
+      `rowSums((d %*% G_inv) * d)`. Resultado: ~3.4x mas rapido en un
+      ajuste de 150 sujetos x 300 iteraciones (de ~23s a ~7s), y
+      proporcionalmente en casos mas chicos.
 - [`ajustar_modelo_microbioma()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/ajustar_modelo_microbioma.md)/[`fit_saem_microbiome()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/ajustar_modelo_microbioma.md)
   se robustecen para seguir el mismo patron que
   [`fit_zibr_taxon()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/fit_zibr_taxon.md)/[`fit_zibbmr_taxon()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/fit_zibbmr_taxon.md):

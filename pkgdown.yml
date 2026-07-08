@@ -1,9 +1,9 @@
 pandoc: 3.8.3
-pkgdown: 2.2.0
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   get-started: get-started.html
-last_built: 2026-07-06T05:30Z
+last_built: 2026-07-08T22:46Z
 urls:
   reference: https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference
   article: https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/articles
