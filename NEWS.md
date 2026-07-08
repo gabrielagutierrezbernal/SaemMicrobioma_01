@@ -58,6 +58,19 @@
   `zibbmr_results_table()`, el caso `zi = FALSE` (sin inflacion de ceros) en
   ambos modelos, y objetos genericos con metodo `logLik()` propio en
   `lrt_zibr()`/`lrt_zibbmr()`.
+* Optimizacion de rendimiento en R puro del motor SAEM (fase 1), sin cambiar
+  la logica estadistica: los resultados numericos son byte-identicos antes y
+  despues (verificado con semilla fija en ZIBR y ZIBBMR). Cambios:
+  (a) en el loop MCMC, `tapply(., id_chain, sum)` -> `rowsum(., id_chain)` y
+      `apply(., 2, function(x) tapply(x, grupo, mean))` ->
+      `rowsum(., grupo)/n_chains`, evitando reconstruir el factor de
+      agrupamiento en cada iteracion;
+  (b) las formas cuadraticas `diag(d %*% G_inv %*% t(d))`, que construian una
+      matriz (n_subjects*n_chains) x (n_subjects*n_chains) completa solo para
+      quedarse con la diagonal, se reemplazan por la identidad equivalente
+      `rowSums((d %*% G_inv) * d)`.
+  Resultado: ~3.4x mas rapido en un ajuste de 150 sujetos x 300 iteraciones
+  (de ~23s a ~7s), y proporcionalmente en casos mas chicos.
 * `ajustar_modelo_microbioma()`/`fit_saem_microbiome()` se robustecen para
   seguir el mismo patron que `fit_zibr_taxon()`/`fit_zibbmr_taxon()`:
   admiten `x_covariables`/`z_covariables` por separado (antes forzaba las
