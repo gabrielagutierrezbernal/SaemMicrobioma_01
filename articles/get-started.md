@@ -178,11 +178,11 @@ fits <- fit_zibr_taxa(
 sapply(fits, coef)
 #>           Taxon1      Taxon2     Taxon3
 #> [1,]  0.05587996  0.13111349 -0.0423997
-#> [2,] 20.25719954 21.30483866 22.1641922
-#> [3,]  3.06685819  3.15047850  3.2081143
+#> [2,] 20.24932804 19.57832672 21.0280064
+#> [3,]  3.06101238  3.01938273  3.1301032
 #> [4,] -0.63237382 -0.39258341 -0.3906250
 #> [5,]  0.01704677 -0.08132268 -0.1669231
-#> [6,]  0.03324855 -0.18405358  0.0821391
+#> [6,]  0.03324854 -0.18405358  0.0821391
 ```
 
 ## Comparar modelos anidados con una prueba de razon de verosimilitudes
@@ -234,13 +234,13 @@ fit_saem_microbiome(
 #> == Parte logistica: p_it ==
 #>              Estimate   Type
 #> Intercept  0.05587996 Random
-#> tiempo    20.25719954  Fixed
-#> grupo      3.06685819  Fixed
+#> tiempo    20.24932804  Fixed
+#> grupo      3.06101238  Fixed
 #> == Parte beta: u_it ==
 #>              Estimate   Type
 #> Intercept -0.63237382 Random
 #> tiempo     0.01704677  Fixed
-#> grupo      0.03324855  Fixed
+#> grupo      0.03324854  Fixed
 #> === Varianzas de efectos aleatorios ===
 #> == Parte logistica ==
 #>              Variance   sqrt.Var

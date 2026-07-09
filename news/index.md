@@ -105,6 +105,22 @@
       `rowSums((d %*% G_inv) * d)`. Resultado: ~3.4x mas rapido en un
       ajuste de 150 sujetos x 300 iteraciones (de ~23s a ~7s), y
       proporcionalmente en casos mas chicos.
+- Optimizacion con C++/Rcpp (fase 2): la funcion interna mas llamada del
+  motor SAEM (`.saem_linear_prob`, el predictor lineal logistico por
+  observacion, invocada ~6 veces por iteracion y en cada evaluacion de
+  `nlminb`) se reimplementa en C++ (`src/saem_linear_prob.cpp`),
+  fusionando en un solo recorrido el gather de filas de `psi`, el
+  producto por la matriz de diseno, la suma por fila y
+  [`plogis()`](https://rdrr.io/r/stats/Logistic.html). Usa `R::plogis()`
+  (la misma rutina que
+  [`stats::plogis()`](https://rdrr.io/r/stats/Logistic.html)), de modo
+  que el resultado es byte-identico al de la version en R puro
+  (verificado con semilla fija en ZIBR y ZIBBMR). El paquete ahora
+  requiere un compilador de C++ para instalarse (dependencia `Rcpp`); es
+  deterministica, sin RNG en C++, para no alterar la secuencia aleatoria
+  ni la reproducibilidad. Speedup acumulado (fases 1 + 2): ~4x respecto
+  de la version original (150 sujetos x 300 iteraciones: ~23s -\> ~5.8s
+  con el paquete instalado y optimizado).
 - [`ajustar_modelo_microbioma()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/ajustar_modelo_microbioma.md)/[`fit_saem_microbiome()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/ajustar_modelo_microbioma.md)
   se robustecen para seguir el mismo patron que
   [`fit_zibr_taxon()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/fit_zibr_taxon.md)/[`fit_zibbmr_taxon()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/fit_zibbmr_taxon.md):
