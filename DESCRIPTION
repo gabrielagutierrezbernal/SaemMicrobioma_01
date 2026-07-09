@@ -15,7 +15,10 @@ Imports:
     MASS,
     stats,
     graphics,
-    numDeriv
+    numDeriv,
+    Rcpp
+LinkingTo:
+    Rcpp
 Suggests:
     testthat (>= 3.0.0),
     knitr,
