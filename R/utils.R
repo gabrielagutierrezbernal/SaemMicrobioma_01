@@ -61,15 +61,7 @@
 }
 
 .saem_linear_prob <- function(psi, cols, id, design) {
-  psi_obs <- psi[id, cols, drop = FALSE]
-
-  if (length(cols) == 1) {
-    eta <- psi_obs[, 1] * design[, 1]
-  } else {
-    eta <- rowSums(psi_obs * design)
-  }
-
-  plogis(eta)
+  saem_linear_prob_cpp(psi, as.integer(cols), as.integer(id), design)
 }
 
 

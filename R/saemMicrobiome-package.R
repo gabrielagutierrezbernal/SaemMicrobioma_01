@@ -13,4 +13,6 @@
 #'
 #' @keywords internal
 #' @importFrom stats rnorm runif rt dt plogis rbinom vcov
+#' @useDynLib saemMicrobiome, .registration = TRUE
+#' @importFrom Rcpp sourceCpp
 "_PACKAGE"
