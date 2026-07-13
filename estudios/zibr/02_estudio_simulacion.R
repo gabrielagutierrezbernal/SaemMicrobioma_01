@@ -32,9 +32,12 @@ for (n_sub in sample_sizes) {
       sigma_alpha=true_sigma_alpha, sigma_beta=true_sigma_beta,
       phi=true_phi, seed=NULL)
     fit <- tryCatch(
+      # La semilla del ajuste varia por replica (seed = r): asi cada
+      # repeticion es una muestra independiente que incluye tanto el ruido de
+      # los datos como el ruido de Monte Carlo del algoritmo SAEM.
       fit_zibr(y=dat$Y, id=dat$Subject, X=dat$X.1, Z=dat$Z.1,
                phi_start=10, alpha_start=c(-0.2,0.1), beta_start=c(0.1,0.1),
-               n_iter=200, seed=1, compute_fim=FALSE),
+               n_iter=200, seed=r, compute_fim=FALSE),
       error=function(e) NULL)
     if (!is.null(fit)) ests[r, ] <- c(fit$mu, fit$phi)
   }

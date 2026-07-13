@@ -45,6 +45,26 @@ problema del codigo.
 Los graficos ya generados estan guardados como `estudio_simulacion_zibr.png` y
 `estudio_simulacion_zibbmr.png`.
 
+La semilla del ajuste varia por replica (`seed = r`), de modo que cada
+repeticion es una muestra independiente que incluye tanto el ruido de los
+datos como el ruido de Monte Carlo del algoritmo.
+
+## `03_chequeo_semilla.R`
+
+El algoritmo SAEM es estocastico: dado un mismo conjunto de datos, el
+resultado depende de la semilla del ajuste (el camino aleatorio de las cadenas
+MCMC). Este script toma UN dataset fijo y lo ajusta con 20 semillas distintas,
+para cuantificar cuanto varia el resultado por ese azar (ruido de Monte Carlo)
+y mostrar que ese ruido se reduce al usar mas cadenas MCMC (`n_chains`).
+
+Imprime la desviacion estandar de los estimados entre semillas para
+`n_chains = 5` y `n_chains = 15`, y guarda un grafico
+(`chequeo_semilla_<modelo>.png`). Conclusion tipica: al triplicar el numero de
+cadenas (5 -> 15), la desviacion entre semillas se reduce aproximadamente a la
+mitad, coherente con un error de Monte Carlo proporcional a 1/raiz(n_chains).
+Es decir: para reportar estimados estables conviene usar suficientes cadenas
+(e iteraciones), no una sola semilla puntual.
+
 ## Como correrlos
 
 Con el paquete instalado, desde R:
@@ -52,8 +72,10 @@ Con el paquete instalado, desde R:
 ```r
 source("estudios/zibr/01_comparacion_john_vs_paquete.R")   # ~40 seg
 source("estudios/zibr/02_estudio_simulacion.R")            # ~3 min
+source("estudios/zibr/03_chequeo_semilla.R")               # ~2 min
 source("estudios/zibbmr/01_comparacion_john_vs_paquete.R") # ~40 seg
 source("estudios/zibbmr/02_estudio_simulacion.R")          # ~3.5 min
+source("estudios/zibbmr/03_chequeo_semilla.R")             # ~2 min
 ```
 
 Los estudios de comparacion requieren conexion a internet (descargan el codigo
