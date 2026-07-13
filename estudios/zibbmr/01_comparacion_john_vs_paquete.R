@@ -15,7 +15,7 @@ j <- grep("^## Examples", lineas)                    # bloque de ejemplos roto
 if (length(j) >= 1) lineas <- lineas[seq_len(j[1] - 1)]
 tmp <- tempfile(fileext = ".R"); writeLines(lineas, tmp); source(tmp)
 
-## 2. Tu paquete
+## 2. Paquete saemMicrobiome
 library(saemMicrobiome)
 
 ## 3. Datos con parametros del ejemplo de John (alpha, beta, s1, s2, v)
@@ -44,7 +44,7 @@ res_john <- saem_zibbmr(
   seed = 232, iter = 500, ncad = 10
 )
 
-## 5. Ajuste con TU paquete (misma funcion, mismos argumentos)
+## 5. Ajuste con el paquete saemMicrobiome (misma funcion, mismos argumentos)
 res_gabriela <- saem_zibbmr_clean(
   Y = Y, X = X, Z = Z, S = S, index = index, zi = TRUE,
   v0 = 15, a0 = c(-0.3, 0.5), b0 = c(-0.2, 0.8),
