@@ -88,10 +88,14 @@ tiene dos partes: una logistica para la probabilidad de presencia
 }
 \examples{
 \donttest{
+n_subjects <- 20
+n_time <- 4
+n_obs <- n_subjects * n_time
 dat <- simulate_zibr_data(
-  n_subjects = 20, n_time = 4, alpha = c(-0.3, 0.5), beta = c(0.2, -0.4),
-  sigma_alpha = 0.4, sigma_beta = 0.3, phi = 15,
-  X = matrix(rbinom(80, 1, 0.5)), Z = matrix(rbinom(80, 1, 0.5)), seed = 1
+  n_subjects = n_subjects, n_time = n_time, alpha = c(-0.3, 0.5),
+  beta = c(0.2, -0.4), sigma_alpha = 0.4, sigma_beta = 0.3, phi = 15,
+  X = matrix(rbinom(n_obs, 1, 0.5)), Z = matrix(rbinom(n_obs, 1, 0.5)),
+  seed = 1
 )
 fit <- fit_zibr(
   y = dat$Y, id = dat$Subject, X = dat$X.1, Z = dat$Z.1,
