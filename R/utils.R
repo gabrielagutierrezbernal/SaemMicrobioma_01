@@ -61,7 +61,11 @@
 }
 
 .saem_linear_prob <- function(psi, cols, id, design) {
-  saem_linear_prob_cpp(psi, as.integer(cols), as.integer(id), design)
+  # El predictor lineal se calcula en C++ (evita materializar psi[id, cols] y
+  # el rowSums); plogis() se aplica en R (vectorizado) para que el resultado
+  # sea byte-identico al de la version en R puro.
+  eta <- saem_linear_eta_cpp(psi, as.integer(cols), as.integer(id), design)
+  plogis(eta)
 }
 
 
