@@ -93,11 +93,15 @@ Un data frame con columnas `Subject`, `Time`, `Y` (conteo simulado),
 ## Examples
 
 ``` r
+n_subjects <- 10
+n_time <- 3
+n_obs <- n_subjects * n_time
 dat <- simulate_zibbmr_data(
-  n_subjects = 10, n_time = 3, S = rep(1000, 30),
+  n_subjects = n_subjects, n_time = n_time, S = rep(1000, n_obs),
   alpha = c(-0.3, 0.5), beta = c(0.2, -0.4),
   sigma_alpha = 0.4, sigma_beta = 0.3, phi = 15,
-  X = matrix(rbinom(30, 1, 0.5)), Z = matrix(rbinom(30, 1, 0.5)), seed = 1
+  X = matrix(rbinom(n_obs, 1, 0.5)), Z = matrix(rbinom(n_obs, 1, 0.5)),
+  seed = 1
 )
 head(dat)
 #>     Subject Time   Y TotalCounts X.1 Z.1
