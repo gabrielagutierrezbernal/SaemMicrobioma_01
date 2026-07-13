@@ -7,7 +7,7 @@
 ## 1. Codigo ORIGINAL de John (de su GitHub, sin modificar)
 source("https://raw.githubusercontent.com/jbarrera232/saem-zibr/main/saem-estimation.R")
 
-## 2. Tu paquete
+## 2. Paquete saemMicrobiome
 library(saemMicrobiome)
 
 ## 3. Datos con los parametros del ejemplo completo de John
@@ -35,7 +35,7 @@ res_john <- saem_zibr(
   seed = 232, iter = 500, ncad = 10
 )
 
-## 5. Ajuste con TU paquete (misma funcion historica, mismos argumentos)
+## 5. Ajuste con el paquete saemMicrobiome (misma funcion historica, mismos argumentos)
 res_gabriela <- saem_zibr_clean(
   Y = Y, X = X, Z = Z, index = index, zi = TRUE,
   v0 = 15, a0 = c(-0.3, 0.5), b0 = c(-0.2, 0.8),
