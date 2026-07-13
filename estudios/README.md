@@ -9,7 +9,10 @@ son scripts reproducibles para respaldar dos afirmaciones:
    los estimados se acercan al valor verdadero y su error disminuye.
 
 Hay una carpeta por modelo: `zibr/` (proporciones) y `zibbmr/` (conteos con
-profundidad de secuenciacion). Cada una tiene los mismos dos estudios.
+profundidad de secuenciacion). Cada una tiene los mismos tres estudios. Ademas,
+`comparacion_tiempos/` compara la estimacion y los tiempos de computo entre el
+codigo de John y las distintas versiones del paquete (sin optimizar, con la
+optimizacion en R puro, y con C++).
 
 ## `01_comparacion_john_vs_paquete.R`
 

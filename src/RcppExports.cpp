@@ -10,9 +10,9 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// saem_linear_prob_cpp
-NumericVector saem_linear_prob_cpp(NumericMatrix psi, IntegerVector cols, IntegerVector id, NumericMatrix design);
-RcppExport SEXP _saemMicrobiome_saem_linear_prob_cpp(SEXP psiSEXP, SEXP colsSEXP, SEXP idSEXP, SEXP designSEXP) {
+// saem_linear_eta_cpp
+NumericVector saem_linear_eta_cpp(NumericMatrix psi, IntegerVector cols, IntegerVector id, NumericMatrix design);
+RcppExport SEXP _saemMicrobiome_saem_linear_eta_cpp(SEXP psiSEXP, SEXP colsSEXP, SEXP idSEXP, SEXP designSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -20,13 +20,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< IntegerVector >::type cols(colsSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type id(idSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type design(designSEXP);
-    rcpp_result_gen = Rcpp::wrap(saem_linear_prob_cpp(psi, cols, id, design));
+    rcpp_result_gen = Rcpp::wrap(saem_linear_eta_cpp(psi, cols, id, design));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_saemMicrobiome_saem_linear_prob_cpp", (DL_FUNC) &_saemMicrobiome_saem_linear_prob_cpp, 4},
+    {"_saemMicrobiome_saem_linear_eta_cpp", (DL_FUNC) &_saemMicrobiome_saem_linear_eta_cpp, 4},
     {NULL, NULL, 0}
 };
 

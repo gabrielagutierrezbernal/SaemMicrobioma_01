@@ -8,8 +8,11 @@ using namespace Rcpp;
 // de diseno y la suma por fila, evitando materializar las matrices
 // intermedias que creaba la version en R puro.
 //
-// Es deterministica (no usa RNG) y usa R::plogis(), la MISMA rutina que
-// stats::plogis() en R, de modo que el resultado es identico al ultimo bit.
+// Es deterministica (no usa RNG). Devuelve SOLO el predictor lineal eta; el
+// logistico plogis(eta) se aplica despues en R (vectorizado), de modo que el
+// resultado es byte-identico al de la version en R puro (misma rutina
+// stats::plogis()) y a la vez se evita materializar en R la matriz
+// intermedia psi[id, cols] y el rowSums.
 //
 // psi:    matriz (n_subjects*n_chains) x n_psi con los efectos por sujeto-cadena
 // cols:   indices de columna de psi a usar (base 1, como en R)
@@ -17,13 +20,13 @@ using namespace Rcpp;
 // design: matriz M x length(cols) con las covariables (incluye intercepto)
 //
 // [[Rcpp::export]]
-NumericVector saem_linear_prob_cpp(NumericMatrix psi,
-                                   IntegerVector cols,
-                                   IntegerVector id,
-                                   NumericMatrix design) {
+NumericVector saem_linear_eta_cpp(NumericMatrix psi,
+                                  IntegerVector cols,
+                                  IntegerVector id,
+                                  NumericMatrix design) {
   const int m = design.nrow();
   const int k = cols.size();
-  NumericVector out(m);
+  NumericVector eta(m);
 
   // indices base 0
   std::vector<int> col0(k);
@@ -31,14 +34,12 @@ NumericVector saem_linear_prob_cpp(NumericMatrix psi,
 
   for (int i = 0; i < m; ++i) {
     const int row = id[i] - 1;
-    double eta = 0.0;
+    double s = 0.0;
     for (int j = 0; j < k; ++j) {
-      eta += psi(row, col0[j]) * design(i, j);
+      s += psi(row, col0[j]) * design(i, j);
     }
-    // R::plogis(x, location, scale, lower_tail, log_p): misma rutina que
-    // stats::plogis(), numericamente estable en las colas.
-    out[i] = R::plogis(eta, 0.0, 1.0, 1, 0);
+    eta[i] = s;
   }
 
-  return out;
+  return eta;
 }
