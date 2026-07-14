@@ -53,9 +53,9 @@ cat(sprintf("  Paquete actual  : %.2f s\n", t_actual))
 
 ## ---------------------------------------------------------------------------
 ## Versiones HISTORICAS del paquete (v0 sin optimizar, Fase 1 en R puro):
-## ver el script aparte `benchmark_historico.R` en esta misma carpeta. Hay que
-## medirlas en procesos R separados (R no permite tener dos versiones del mismo
-## paquete cargadas en una sesion), por eso van en su propio script. Ejecutarlo
-## desde la raiz del repositorio:
+## ver el script aparte `benchmark_historico_zibr.R` en esta misma carpeta. Hay
+## que medirlas en procesos R separados (R no permite tener dos versiones del
+## mismo paquete cargadas en una sesion), por eso van en su propio script.
+## Ejecutarlo desde la raiz del repositorio:
 ##   setwd("ruta/al/repo")
-##   source("estudios/comparacion_tiempos/benchmark_historico.R")
+##   source("estudios/comparacion_tiempos/benchmark_historico_zibr.R")

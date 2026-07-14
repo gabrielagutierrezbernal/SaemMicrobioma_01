@@ -13,14 +13,15 @@ Objetivo doble: (a) verificar que **todas estiman lo mismo** y (b) comparar los
 
 ## Condiciones del benchmark
 
-- Datos: 150 sujetos x 4 tiempos (600 observaciones), modelo ZIBR, una
-  covariable de grupo binaria. 313 observaciones en cero.
+- Datos: 150 sujetos x 4 tiempos (600 observaciones), una covariable de grupo
+  binaria. Se comparan los dos modelos: **ZIBR** (proporciones) y **ZIBBMR**
+  (conteos, con profundidad de secuenciacion S = 1000).
 - Ajuste: `iter = 300`, `ncad = 5` (5 cadenas), `seed = 232`, valores
   iniciales `v0 = 10`, `a0 = c(-0.2, 0.1)`, `b0 = c(0.1, 0.1)`.
 - Tiempo = mediana de varias corridas, misma maquina, cada version instalada
   del mismo modo (`R CMD INSTALL`) y medida via `library()`.
 
-## Resultados
+## Resultados - ZIBR (proporciones)
 
 ### ¿Estiman lo mismo?
 
@@ -45,6 +46,30 @@ el ultimo decimal, ~10 cifras significativas):
 | Fase 1 - R puro              |  3.45 s | **2.3x** |
 | Fase 2 - con C++ (Rcpp)      |  3.38 s | 2.4x |
 
+## Resultados - ZIBBMR (conteos)
+
+### ¿Estiman lo mismo?
+
+Si, tambien byte-identicos entre las cuatro versiones:
+
+| Parametro | Valor estimado (identico en las 4 versiones) |
+|-----------|----------------------------------------------|
+| alpha (intercepto) | -0.3968228 |
+| alpha (grupo)      |  0.5467545 |
+| beta (intercepto)  |  0.1875829 |
+| beta (grupo)       | -0.3809879 |
+| phi                | 13.8987700 |
+| log-verosimilitud  | -2218.608 |
+
+### Tiempos de computo
+
+| Version | Tiempo (mediana) | Aceleracion vs sin optimizar |
+|---------|------------------|------------------------------|
+| John (original)              | 12.57 s | referencia |
+| v0 - sin optimizar           |  8.47 s | 1.0x |
+| Fase 1 - R puro              |  3.78 s | **2.2x** |
+| Fase 2 - con C++ (Rcpp)      |  3.78 s | 2.2x |
+
 (Nota: John siempre calcula ademas la matriz de informacion de Fisher, que en
 el paquete se puede omitir con `compute_fim = FALSE`; parte de su mayor tiempo
 se debe a ese paso extra.)
@@ -65,15 +90,24 @@ se debe a ese paso extra.)
   aporta cuando reemplaza loops interpretados de R, que es lo que ya habia
   hecho la Fase 1. Es un resultado honesto y esperable: el codigo en R puro
   ya estaba cerca del optimo para este tipo de operaciones.
+- **El patron es el mismo en los dos modelos** (ZIBR y ZIBBMR): ~2.2-2.3x mas
+  rapido gracias a la Fase 1, sin cambiar ningun resultado. Es esperable,
+  porque las optimizaciones estan en las mismas funciones internas compartidas
+  por ambos modelos.
 
 ## Reproducir
 
-- `benchmark_tiempos.R`: compara John vs la version ACTUAL del paquete
-  (verifica que estiman lo mismo y mide sus tiempos). Se puede correr desde
-  cualquier carpeta con el paquete instalado.
-- `benchmark_historico.R`: mide las versiones historicas del paquete (v0 y
-  Fase 1). DEBE ejecutarse desde la raiz del repositorio (necesita git y
-  compilador) porque instala cada commit y lo mide en un proceso R separado.
-  Correr en la misma sesion no sirve: R no permite tener dos versiones del
-  mismo paquete cargadas a la vez, y daria tiempos falsos (todos iguales a la
-  version actual).
+Comparacion John vs version ACTUAL (verifica que estiman lo mismo y mide sus
+tiempos; se puede correr desde cualquier carpeta con el paquete instalado):
+
+- `benchmark_tiempos_zibr.R` (modelo ZIBR)
+- `benchmark_tiempos_zibbmr.R` (modelo ZIBBMR)
+
+Versiones HISTORICAS del paquete (v0 y Fase 1). DEBEN ejecutarse desde la raiz
+del repositorio (necesitan git y compilador) porque instalan cada commit y lo
+miden en un proceso R separado. Correr en la misma sesion no sirve: R no
+permite tener dos versiones del mismo paquete cargadas a la vez, y daria
+tiempos falsos (todos iguales a la version actual):
+
+- `benchmark_historico_zibr.R` (modelo ZIBR)
+- `benchmark_historico_zibbmr.R` (modelo ZIBBMR)
