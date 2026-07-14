@@ -52,26 +52,10 @@ cat(sprintf("  John (original) : %.2f s\n", t_john))
 cat(sprintf("  Paquete actual  : %.2f s\n", t_actual))
 
 ## ---------------------------------------------------------------------------
-## OPCIONAL: reproducir las versiones historicas del paquete.
-## Requiere git y compilador. Se instala cada commit en una libreria temporal
-## y se mide igual. Commits:
-##   v0 (sin optimizar)      : 77a00b4
-##   Fase 1 (optimizacion R) : 9b9e368
-## Descomentar para ejecutar (tarda varios minutos):
-#
-# medir_commit <- function(hash) {
-#   wt  <- tempfile("wt_");  lib <- tempfile("lib_"); dir.create(lib)
-#   system2("git", c("worktree", "add", "-f", wt, hash), stdout = FALSE, stderr = FALSE)
-#   system2("R", c("CMD", "INSTALL", "-l", lib, wt), stdout = FALSE, stderr = FALSE)
-#   on.exit({ system2("git", c("worktree", "remove", "--force", wt)) }, add = TRUE)
-#   pkg <- asNamespace  # placeholder
-#   .libPaths(c(lib, .libPaths()))
-#   ns <- loadNamespace("saemMicrobiome", lib.loc = lib)
-#   ff <- get("fit_zibr", envir = ns)
-#   f  <- function() ff(y = Y, id = index, X = X, Z = Z, phi_start = 10,
-#                       alpha_start = c(-0.2, 0.1), beta_start = c(0.1, 0.1),
-#                       n_iter = 300, n_chains = 5, seed = 232, compute_fim = FALSE)
-#   med_tiempo(f)
-# }
-# cat(sprintf("  v0 (77a00b4)    : %.2f s\n", medir_commit("77a00b4")))
-# cat(sprintf("  Fase 1 (9b9e368): %.2f s\n", medir_commit("9b9e368")))
+## Versiones HISTORICAS del paquete (v0 sin optimizar, Fase 1 en R puro):
+## ver el script aparte `benchmark_historico.R` en esta misma carpeta. Hay que
+## medirlas en procesos R separados (R no permite tener dos versiones del mismo
+## paquete cargadas en una sesion), por eso van en su propio script. Ejecutarlo
+## desde la raiz del repositorio:
+##   setwd("ruta/al/repo")
+##   source("estudios/comparacion_tiempos/benchmark_historico.R")

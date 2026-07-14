@@ -68,4 +68,12 @@ se debe a ese paso extra.)
 
 ## Reproducir
 
-Ver `benchmark_tiempos.R` en esta carpeta.
+- `benchmark_tiempos.R`: compara John vs la version ACTUAL del paquete
+  (verifica que estiman lo mismo y mide sus tiempos). Se puede correr desde
+  cualquier carpeta con el paquete instalado.
+- `benchmark_historico.R`: mide las versiones historicas del paquete (v0 y
+  Fase 1). DEBE ejecutarse desde la raiz del repositorio (necesita git y
+  compilador) porque instala cada commit y lo mide en un proceso R separado.
+  Correr en la misma sesion no sirve: R no permite tener dos versiones del
+  mismo paquete cargadas a la vez, y daria tiempos falsos (todos iguales a la
+  version actual).
