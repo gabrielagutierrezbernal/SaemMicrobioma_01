@@ -33,6 +33,13 @@ remotes::install_github("gabrielagutierrezbernal/SaemMicrobioma_01")
 
 ## Ejemplo: ZIBR (proporciones)
 
+> **Nota:** este es un ejemplo minimo de uso con pocos sujetos. Con un
+> tamano de muestra chico, los estimados de un unico ajuste traen ruido
+> de muestreo y pueden quedar lejos de los valores verdaderos usados en
+> la simulacion; no es un problema del metodo. Para la validacion
+> estadistica (al aumentar el numero de sujetos los estimados se acercan
+> a la verdad y su error disminuye) ver la carpeta `estudios/`.
+
 ``` r
 library(saemMicrobiome)
 
