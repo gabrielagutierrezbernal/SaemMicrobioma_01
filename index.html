@@ -57,23 +57,23 @@
 </h1></div>
 <!-- badges: start -->
 
-<p><code>saemMicrobiome</code> implementa dos modelos mixtos con inflacion de ceros para datos longitudinales de microbioma, estimados con el algoritmo Stochastic Approximation EM (SAEM):</p>
+<p><code>saemMicrobiome</code> implementa dos modelos mixtos con inflación de ceros para datos longitudinales de microbioma, estimados con el algoritmo Stochastic Approximation EM (SAEM):</p>
 <ul>
 <li>
 <strong>ZIBR</strong> (zero-inflated beta regression) para proporciones o abundancias relativas — ver [<code><a href="reference/fit_zibr.html">fit_zibr()</a></code>].</li>
 <li>
 <strong>ZIBBMR</strong> (zero-inflated beta-binomial mixed regression) para conteos con profundidad de secuenciacion conocida — ver [<code><a href="reference/fit_zibbmr.html">fit_zibbmr()</a></code>].</li>
 </ul>
-<p>Ambos modelos y su algoritmo de estimacion fueron desarrollados originalmente por John Barrera:</p>
+<p>Ambos modelos y su algoritmo de estimación fueron desarrollados originalmente por John Barrera:</p>
 <ul>
 <li>ZIBR: <a href="https://github.com/jbarrera232/saem-zibr" class="external-link uri">https://github.com/jbarrera232/saem-zibr</a>
 </li>
 <li>ZIBBMR: <a href="https://github.com/jbarrera232/saem-zibbmr" class="external-link uri">https://github.com/jbarrera232/saem-zibbmr</a>
 </li>
 </ul>
-<p>Este paquete organiza, documenta y testea esa implementacion para uso general en analisis de microbioma longitudinal.</p>
+<p>Este paquete organiza, documenta y testea esa implementación para uso general en análisis de microbioma longitudinal.</p>
 <div class="section level2">
-<h2 id="instalacion">Instalacion<a class="anchor" aria-label="anchor" href="#instalacion"></a>
+<h2 id="instalación">Instalación<a class="anchor" aria-label="anchor" href="#instalaci%C3%B3n"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
@@ -125,7 +125,7 @@
 <span><span class="co">#&gt; === Log-verosimilitud marginal (importance sampling): -48.88571</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="ejemplo-zibbmr-conteos-con-profundidad-de-secuenciacion">Ejemplo: ZIBBMR (conteos con profundidad de secuenciacion)<a class="anchor" aria-label="anchor" href="#ejemplo-zibbmr-conteos-con-profundidad-de-secuenciacion"></a>
+<h2 id="ejemplo-zibbmr-conteos-con-profundidad-de-secuenciación">Ejemplo: ZIBBMR (conteos con profundidad de secuenciación)<a class="anchor" aria-label="anchor" href="#ejemplo-zibbmr-conteos-con-profundidad-de-secuenciaci%C3%B3n"></a>
 </h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Reutiliza n_subjects / n_time / n_obs del ejemplo anterior.</span></span>
@@ -165,7 +165,7 @@
 <span><span class="co">#&gt; === Log-verosimilitud marginal (importance sampling): -464.3804</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="ajuste-por-taxon-y-comparacion-de-modelos-anidados">Ajuste por taxon y comparacion de modelos anidados<a class="anchor" aria-label="anchor" href="#ajuste-por-taxon-y-comparacion-de-modelos-anidados"></a>
+<h2 id="ajuste-por-taxón-y-comparación-de-modelos-anidados">Ajuste por taxón y comparación de modelos anidados<a class="anchor" aria-label="anchor" href="#ajuste-por-tax%C3%B3n-y-comparaci%C3%B3n-de-modelos-anidados"></a>
 </h2>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simular_datos_microbioma.html">simular_datos_microbioma</a></span><span class="op">(</span>n_ind <span class="op">=</span> <span class="fl">15</span>, n_time <span class="op">=</span> <span class="fl">4</span>, n_taxa <span class="op">=</span> <span class="fl">3</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
@@ -184,9 +184,9 @@
 <span><span class="co">#&gt; 1 14.64046   12.90933 3.462264  1 0.06278431</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="mas-informacion">Mas informacion<a class="anchor" aria-label="anchor" href="#mas-informacion"></a>
+<h2 id="mas-información">Mas información<a class="anchor" aria-label="anchor" href="#mas-informaci%C3%B3n"></a>
 </h2>
-<p>Ver <code><a href="articles/get-started.html">vignette("get-started", package = "saemMicrobiome")</a></code> para una introduccion mas completa, incluyendo cuando usar ZIBR vs. ZIBBMR y como preparar datos propios.</p>
+<p>Ver <code><a href="articles/get-started.html">vignette("get-started", package = "saemMicrobiome")</a></code> para una introducción más completa, incluyendo cuando usar ZIBR vs. ZIBBMR y como preparar datos propios.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
