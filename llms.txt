@@ -17,8 +17,8 @@ originalmente por John Barrera:
 - ZIBR: <https://github.com/jbarrera232/saem-zibr>
 - ZIBBMR: <https://github.com/jbarrera232/saem-zibbmr>
 
-Este paquete organiza, documenta y testea esa implementación para uso
-general en análisis de microbioma longitudinal.
+Este paquete organiza, documenta y testea esa implementacion para uso
+general en analisis de microbioma longitudinal.
 
 ## Instalación
 
@@ -29,6 +29,13 @@ remotes::install_github("gabrielagutierrezbernal/SaemMicrobioma_01")
 ```
 
 ## Ejemplo: ZIBR (proporciones)
+
+> **Nota:** este es un ejemplo mínimo de uso con pocos sujetos. Con un
+> tamaño de muestra chico, los estimados de un único ajuste traen ruido
+> de muestreo y pueden quedar lejos de los valores verdaderos usados en
+> la simulación; no es un problema del método. Para la validación
+> estadística (al aumentar el número de sujetos los estimados se acercan
+> a la verdad y su error disminuye) ver la carpeta `estudios/`.
 
 ``` r
 
@@ -74,7 +81,7 @@ print(fit)
 #> === Log-verosimilitud marginal (importance sampling): -48.88571
 ```
 
-## Ejemplo: ZIBBMR (conteos con profundidad de secuenciación)
+## Ejemplo: ZIBBMR (conteos con profundidad de secuenciacion)
 
 ``` r
 
@@ -115,7 +122,7 @@ print(fit_counts)
 #> === Log-verosimilitud marginal (importance sampling): -464.3804
 ```
 
-## Ajuste por taxón y comparación de modelos anidados
+## Ajuste por taxon y comparación de modelos anidados
 
 ``` r
 
@@ -135,7 +142,7 @@ lrt_zibr(full, reduced, df = 1)
 #> 1 14.64046   12.90933 3.462264  1 0.06278431
 ```
 
-## Mas información
+## Más información
 
 Ver
 [`vignette("get-started", package = "saemMicrobiome")`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/articles/get-started.md)
