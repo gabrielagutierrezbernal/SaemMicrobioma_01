@@ -6,7 +6,7 @@
 [![R-CMD-check](https://github.com/gabrielagutierrezbernal/SaemMicrobioma_01/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/gabrielagutierrezbernal/SaemMicrobioma_01/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-`saemMicrobiome` implementa dos modelos mixtos con inflacion de ceros
+`saemMicrobiome` implementa dos modelos mixtos con inflación de ceros
 para datos longitudinales de microbioma, estimados con el algoritmo
 Stochastic Approximation EM (SAEM):
 
@@ -15,16 +15,16 @@ Stochastic Approximation EM (SAEM):
 - **ZIBBMR** (zero-inflated beta-binomial mixed regression) para conteos
   con profundidad de secuenciacion conocida — ver \[`fit_zibbmr()`\].
 
-Ambos modelos y su algoritmo de estimacion fueron desarrollados
+Ambos modelos y su algoritmo de estimación fueron desarrollados
 originalmente por John Barrera:
 
 - ZIBR: <https://github.com/jbarrera232/saem-zibr>
 - ZIBBMR: <https://github.com/jbarrera232/saem-zibbmr>
 
-Este paquete organiza, documenta y testea esa implementacion para uso
-general en analisis de microbioma longitudinal.
+Este paquete organiza, documenta y testea esa implementación para uso
+general en análisis de microbioma longitudinal.
 
-## Instalacion
+## Instalación
 
 ``` r
 # install.packages("remotes")
@@ -83,7 +83,7 @@ print(fit)
 #> === Log-verosimilitud marginal (importance sampling): -48.88571
 ```
 
-## Ejemplo: ZIBBMR (conteos con profundidad de secuenciacion)
+## Ejemplo: ZIBBMR (conteos con profundidad de secuenciación)
 
 ``` r
 # Reutiliza n_subjects / n_time / n_obs del ejemplo anterior.
@@ -123,7 +123,7 @@ print(fit_counts)
 #> === Log-verosimilitud marginal (importance sampling): -464.3804
 ```
 
-## Ajuste por taxon y comparacion de modelos anidados
+## Ajuste por taxón y comparación de modelos anidados
 
 ``` r
 sim <- simular_datos_microbioma(n_ind = 15, n_time = 4, n_taxa = 3, seed = 1)
@@ -142,8 +142,8 @@ lrt_zibr(full, reduced, df = 1)
 #> 1 14.64046   12.90933 3.462264  1 0.06278431
 ```
 
-## Mas informacion
+## Mas información
 
 Ver `vignette("get-started", package = "saemMicrobiome")` para una
-introduccion mas completa, incluyendo cuando usar ZIBR vs. ZIBBMR y como
+introducción más completa, incluyendo cuando usar ZIBR vs. ZIBBMR y como
 preparar datos propios.
