@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 [![R-CMD-check](https://github.com/gabrielagutierrezbernal/SaemMicrobioma_01/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/gabrielagutierrezbernal/SaemMicrobioma_01/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-`saemMicrobiome` implementa dos modelos mixtos con inflacion de ceros para
+`saemMicrobiome` implementa dos modelos mixtos con inflación de ceros para
 datos longitudinales de microbioma, estimados con el algoritmo Stochastic
 Approximation EM (SAEM):
 
@@ -25,7 +25,7 @@ Approximation EM (SAEM):
 - **ZIBBMR** (zero-inflated beta-binomial mixed regression) para conteos con
   profundidad de secuenciacion conocida — ver [`fit_zibbmr()`].
 
-Ambos modelos y su algoritmo de estimacion fueron desarrollados originalmente
+Ambos modelos y su algoritmo de estimación fueron desarrollados originalmente
 por John Barrera:
 
 - ZIBR: <https://github.com/jbarrera232/saem-zibr>
@@ -34,7 +34,7 @@ por John Barrera:
 Este paquete organiza, documenta y testea esa implementacion para uso general
 en analisis de microbioma longitudinal.
 
-## Instalacion
+## Instalación
 
 ```r
 # install.packages("remotes")
@@ -97,7 +97,7 @@ fit_counts <- fit_zibbmr(
 print(fit_counts)
 ```
 
-## Ajuste por taxon y comparacion de modelos anidados
+## Ajuste por taxon y comparación de modelos anidados
 
 ```{r ejemplo-taxon}
 sim <- simular_datos_microbioma(n_ind = 15, n_time = 4, n_taxa = 3, seed = 1)
@@ -114,8 +114,8 @@ reduced <- fit_zibr_taxon(
 lrt_zibr(full, reduced, df = 1)
 ```
 
-## Mas informacion
+## Más información
 
 Ver `vignette("get-started", package = "saemMicrobiome")` para una
-introduccion mas completa, incluyendo cuando usar ZIBR vs. ZIBBMR y como
+introducción más completa, incluyendo cuando usar ZIBR vs. ZIBBMR y como
 preparar datos propios.
