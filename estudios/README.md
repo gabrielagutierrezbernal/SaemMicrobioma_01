@@ -31,13 +31,13 @@ Notas:
   y un bloque de ejemplos roto al final; el script los corrige automaticamente
   al descargarlo, **sin tocar la lógica del método**.
 
-## `02_estudio_simulación.R`
+## `02_estudio_simulacion.R`
 
 Estudio de simulación: repite el ajuste sobre muchos datasets simulados
 (`n_rep = 30` por defecto) para tres tamaños de muestra (30, 100 y 300 sujetos),
 con valores verdaderos conocidos. Imprime el promedio y la desviación estándar
 de los estimados por tamaño, y guarda un gráfico de cajas
-(`estudio_simulación_<modelo>.png`).
+(`estudio_simulacion_<modelo>.png`).
 
 Lectura del gráfico: la linea roja punteada es el valor verdadero. Al subir el
 número de sujetos, la caja (a) se estrecha -el error disminuye- y (b) se centra
@@ -45,8 +45,8 @@ en la línea roja -el estimador apunta al valor correcto-. Es la demostración d
 que el "ruido" con pocos sujetos es un efecto de tamaño de muestra, no un
 problema del código.
 
-Los gráficos ya generados estan guardados como `estudio_simulación_zibr.png` y
-`estudio_simulación_zibbmr.png`.
+Los gráficos ya generados estan guardados como `estudio_simulacion_zibr.png` y
+`estudio_simulacion_zibbmr.png`.
 
 La semilla del ajuste varia por replica (`seed = r`), de modo que cada
 repetición es una muestra independiente que incluye tanto el ruido de los
@@ -74,10 +74,10 @@ Con el paquete instalado, desde R:
 
 ```r
 source("estudios/zibr/01_comparacion_john_vs_paquete.R")   # ~40 seg
-source("estudios/zibr/02_estudio_simulación.R")            # ~3 min
+source("estudios/zibr/02_estudio_simulacion.R")            # ~3 min
 source("estudios/zibr/03_chequeo_semilla.R")               # ~2 min
 source("estudios/zibbmr/01_comparacion_john_vs_paquete.R") # ~40 seg
-source("estudios/zibbmr/02_estudio_simulación.R")          # ~3.5 min
+source("estudios/zibbmr/02_estudio_simulacion.R")          # ~3.5 min
 source("estudios/zibbmr/03_chequeo_semilla.R")             # ~2 min
 ```
 
