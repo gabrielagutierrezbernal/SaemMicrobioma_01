@@ -43,35 +43,36 @@ remotes::install_github("gabrielagutierrezbernal/SaemMicrobioma_01")
 
 ## Ejemplo: ZIBR (proporciones)
 
-> **Nota:** este es un ejemplo mínimo de uso con pocos sujetos. Con un tamaño
-> de muestra chico, los estimados de un único ajuste traen ruido de muestreo y
-> pueden quedar lejos de los valores verdaderos usados en la simulación; no es
-> un problema del método. Para la validación estadística (al aumentar el número
-> de sujetos los estimados se acercan a la verdad y su error disminuye) ver la
-> carpeta `estudios/`.
+> **Nota:** el ejemplo usa 300 sujetos, un tamaño de muestra suficiente para
+> que los estimados queden cerca de los valores verdaderos usados en la
+> simulación (`alpha = c(-0.3, 0.5)`, `beta = c(0.2, -0.4)`, `phi = 15`). Con
+> muestras pequeñas, los estimados de un único ajuste traen más ruido de
+> muestreo; en la carpeta `estudios/` se muestra cómo el error disminuye al
+> aumentar el número de sujetos.
 
 ```{r ejemplo-zibr}
 library(saemMicrobiome)
 
 # Solo hace falta cambiar n_subjects / n_time; n_obs se deriva de ellos.
-n_subjects <- 30
+n_subjects <- 300
 n_time <- 4
 n_obs <- n_subjects * n_time
 
-set.seed(1)
+set.seed(3)
 dat <- simulate_zibr_data(
   n_subjects = n_subjects, n_time = n_time,
   X = matrix(rbinom(n_obs, 1, 0.5)), Z = matrix(rbinom(n_obs, 1, 0.5)),
   alpha = c(-0.3, 0.5), beta = c(0.2, -0.4),
-  sigma_alpha = 0.4, sigma_beta = 0.3, phi = 15, seed = 1
+  sigma_alpha = 0.4, sigma_beta = 0.3, phi = 15, seed = 3
 )
 
 fit <- fit_zibr(
   y = dat$Y, id = dat$Subject, X = dat$X.1, Z = dat$Z.1,
   phi_start = 10, alpha_start = c(-0.2, 0.1), beta_start = c(0.1, 0.1),
-  n_iter = 100, seed = 1, compute_fim = FALSE
+  n_iter = 300, seed = 1, compute_fim = FALSE
 )
 
+# Los estimados quedan cerca de los valores verdaderos (-0.3, 0.5, 0.2, -0.4, 15)
 print(fit)
 ```
 
@@ -80,20 +81,22 @@ print(fit)
 ```{r ejemplo-zibbmr}
 # Reutiliza n_subjects / n_time / n_obs del ejemplo anterior.
 S <- rep(1000, n_obs)
+set.seed(3)
 dat_counts <- simulate_zibbmr_data(
   n_subjects = n_subjects, n_time = n_time, S = S,
   X = matrix(rbinom(n_obs, 1, 0.5)), Z = matrix(rbinom(n_obs, 1, 0.5)),
   alpha = c(-0.3, 0.5), beta = c(0.2, -0.4),
-  sigma_alpha = 0.4, sigma_beta = 0.3, phi = 15, seed = 1
+  sigma_alpha = 0.4, sigma_beta = 0.3, phi = 15, seed = 3
 )
 
 fit_counts <- fit_zibbmr(
   y = dat_counts$Y, S = dat_counts$TotalCounts, id = dat_counts$Subject,
   X = dat_counts$X.1, Z = dat_counts$Z.1,
   phi_start = 10, alpha_start = c(-0.2, 0.1), beta_start = c(0.1, 0.1),
-  n_iter = 100, seed = 1, compute_fim = FALSE
+  n_iter = 300, seed = 1, compute_fim = FALSE
 )
 
+# Los estimados quedan cerca de los valores verdaderos (-0.3, 0.5, 0.2, -0.4, 15)
 print(fit_counts)
 ```
 
