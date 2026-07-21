@@ -156,20 +156,20 @@ print(fit)
 #> ===== Resultados SAEM-ZIBBMR =====
 #> == Parte logistica: p_it ==
 #>             Estimate   Type
-#> Intercept -0.5592309 Random
-#> X.1        0.4972774  Fixed
+#> Intercept -0.5747908 Random
+#> X.1        0.5090540  Fixed
 #> == Parte beta-binomial: u_it ==
 #>             Estimate   Type
-#> Intercept  0.1423486 Random
-#> Z.1       -0.4908755  Fixed
+#> Intercept  0.1447546 Random
+#> Z.1       -0.4826572  Fixed
 #> === Varianzas de efectos aleatorios ===
 #> == Parte logistica ==
-#>             Variance  sqrt.Var
-#> Intercept 0.05721818 0.2392032
+#>            Variance  sqrt.Var
+#> Intercept 0.0630821 0.2511615
 #> == Parte beta-binomial ==
-#>             Variance  sqrt.Var
-#> Intercept 0.05981523 0.2445715
-#> === Phi: 12.0252
-#> === Log-verosimilitud marginal (importance sampling): -272.1644
+#>            Variance  sqrt.Var
+#> Intercept 0.1055846 0.3249378
+#> === Phi: 13.58774
+#> === Log-verosimilitud marginal (importance sampling): -272.0834
 # }
 ```

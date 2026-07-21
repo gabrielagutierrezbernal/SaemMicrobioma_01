@@ -135,37 +135,46 @@ estimados queden cerca de los valores verdaderos de la simulacion
 <span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_zibr.html">fit_zibr</a></span><span class="op">(</span></span>
 <span>  y <span class="op">=</span> <span class="va">dat</span><span class="op">$</span><span class="va">Y</span>, id <span class="op">=</span> <span class="va">dat</span><span class="op">$</span><span class="va">Subject</span>, X <span class="op">=</span> <span class="va">dat</span><span class="op">$</span><span class="va">X.1</span>, Z <span class="op">=</span> <span class="va">dat</span><span class="op">$</span><span class="va">Z.1</span>,</span>
 <span>  phi_start <span class="op">=</span> <span class="fl">10</span>, alpha_start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.2</span>, <span class="fl">0.1</span><span class="op">)</span>, beta_start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.1</span><span class="op">)</span>,</span>
-<span>  n_iter <span class="op">=</span> <span class="fl">300</span>, seed <span class="op">=</span> <span class="fl">1</span>, compute_fim <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  n_iter <span class="op">=</span> <span class="fl">500</span>, seed <span class="op">=</span> <span class="fl">1</span>, compute_fim <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">fit</span></span>
 <span><span class="co">#&gt; ===== Resultados SAEM-ZIBR =====</span></span>
 <span><span class="co">#&gt; == Parte logistica: p_it ==</span></span>
 <span><span class="co">#&gt;             Estimate   Type</span></span>
-<span><span class="co">#&gt; Intercept -0.3399294 Random</span></span>
-<span><span class="co">#&gt; X.1        0.5208532  Fixed</span></span>
+<span><span class="co">#&gt; Intercept -0.3491779 Random</span></span>
+<span><span class="co">#&gt; X.1        0.5266508  Fixed</span></span>
 <span><span class="co">#&gt; == Parte beta: u_it ==</span></span>
 <span><span class="co">#&gt;             Estimate   Type</span></span>
-<span><span class="co">#&gt; Intercept  0.2482872 Random</span></span>
-<span><span class="co">#&gt; Z.1       -0.4706505  Fixed</span></span>
+<span><span class="co">#&gt; Intercept  0.2616168 Random</span></span>
+<span><span class="co">#&gt; Z.1       -0.4927260  Fixed</span></span>
 <span><span class="co">#&gt; === Varianzas de efectos aleatorios ===</span></span>
 <span><span class="co">#&gt; == Parte logistica ==</span></span>
 <span><span class="co">#&gt;            Variance  sqrt.Var</span></span>
-<span><span class="co">#&gt; Intercept 0.2364414 0.4862524</span></span>
+<span><span class="co">#&gt; Intercept 0.1990679 0.4461702</span></span>
 <span><span class="co">#&gt; == Parte beta ==</span></span>
-<span><span class="co">#&gt;             Variance sqrt.Var</span></span>
-<span><span class="co">#&gt; Intercept 0.09794836 0.312967</span></span>
-<span><span class="co">#&gt; === Phi: 15.46839</span></span>
-<span><span class="co">#&gt; === Log-verosimilitud marginal (importance sampling): -493.7047</span></span></code></pre></div>
+<span><span class="co">#&gt;            Variance  sqrt.Var</span></span>
+<span><span class="co">#&gt; Intercept 0.1050135 0.3240579</span></span>
+<span><span class="co">#&gt; === Phi: 15.72674</span></span>
+<span><span class="co">#&gt; === Log-verosimilitud marginal (importance sampling): -493.9268</span></span></code></pre></div>
 <p>El objeto devuelto tiene metodos estandar de R para modelos
 ajustados:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/coef.html" class="external-link">coef</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] -0.3399294  0.5208532  0.2482872 -0.4706505</span></span>
+<span><span class="co">#&gt; [1] -0.3491779  0.5266508  0.2616168 -0.4927260</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/stats/logLik.html" class="external-link">logLik</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 'log Lik.' -493.7047 (df=7)</span></span>
+<span><span class="co">#&gt; 'log Lik.' -493.9268 (df=7)</span></span>
 <span><span class="fu"><a href="../reference/se.html">se</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.20597604 0.22637659 0.03995294 0.05138446 1.44379327 0.05903325 0.03114856</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 0.06628286 0.10457177 0.03579351 0.04600874 1.14040691 0.09891814 0.01989323</span></span></code></pre></div>
+<blockquote>
+<p><strong>Nota:</strong> con algunos conjuntos de datos, o con pocas
+iteraciones, la matriz de informacion de la parte logistica puede quedar
+mal condicionada y <code><a href="../reference/se.html">se()</a></code> devolver <code>NaN</code> para esos
+coeficientes. No afecta a las estimaciones (los coeficientes son
+correctos); solo indica que no se pudo calcular el error estandar de
+esos terminos. Suele resolverse aumentando <code>n_iter</code> o el
+numero de sujetos.</p>
+</blockquote>
 <p>El metodo <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> ofrece varios graficos segun el
 argumento <code>which</code>: convergencia del algoritmo, coeficientes
 con intervalo de confianza, y distribucion de los efectos
@@ -211,28 +220,28 @@ proporcion ya dividida:</p>
 <span>  y <span class="op">=</span> <span class="va">dat_counts</span><span class="op">$</span><span class="va">Y</span>, S <span class="op">=</span> <span class="va">dat_counts</span><span class="op">$</span><span class="va">TotalCounts</span>, id <span class="op">=</span> <span class="va">dat_counts</span><span class="op">$</span><span class="va">Subject</span>,</span>
 <span>  X <span class="op">=</span> <span class="va">dat_counts</span><span class="op">$</span><span class="va">X.1</span>, Z <span class="op">=</span> <span class="va">dat_counts</span><span class="op">$</span><span class="va">Z.1</span>,</span>
 <span>  phi_start <span class="op">=</span> <span class="fl">10</span>, alpha_start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.2</span>, <span class="fl">0.1</span><span class="op">)</span>, beta_start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.1</span><span class="op">)</span>,</span>
-<span>  n_iter <span class="op">=</span> <span class="fl">300</span>, seed <span class="op">=</span> <span class="fl">1</span>, compute_fim <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  n_iter <span class="op">=</span> <span class="fl">500</span>, seed <span class="op">=</span> <span class="fl">1</span>, compute_fim <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">fit_counts</span></span>
 <span><span class="co">#&gt; ===== Resultados SAEM-ZIBBMR =====</span></span>
 <span><span class="co">#&gt; == Parte logistica: p_it ==</span></span>
 <span><span class="co">#&gt;             Estimate   Type</span></span>
-<span><span class="co">#&gt; Intercept -0.3025037 Random</span></span>
-<span><span class="co">#&gt; X.1        0.5129910  Fixed</span></span>
+<span><span class="co">#&gt; Intercept -0.3176600 Random</span></span>
+<span><span class="co">#&gt; X.1        0.5393887  Fixed</span></span>
 <span><span class="co">#&gt; == Parte beta-binomial: u_it ==</span></span>
 <span><span class="co">#&gt;             Estimate   Type</span></span>
-<span><span class="co">#&gt; Intercept  0.2188075 Random</span></span>
-<span><span class="co">#&gt; Z.1       -0.4274006  Fixed</span></span>
+<span><span class="co">#&gt; Intercept  0.2233562 Random</span></span>
+<span><span class="co">#&gt; Z.1       -0.4379817  Fixed</span></span>
 <span><span class="co">#&gt; === Varianzas de efectos aleatorios ===</span></span>
 <span><span class="co">#&gt; == Parte logistica ==</span></span>
 <span><span class="co">#&gt;            Variance  sqrt.Var</span></span>
-<span><span class="co">#&gt; Intercept 0.1791427 0.4232526</span></span>
+<span><span class="co">#&gt; Intercept 0.1718038 0.4144922</span></span>
 <span><span class="co">#&gt; == Parte beta-binomial ==</span></span>
 <span><span class="co">#&gt;            Variance  sqrt.Var</span></span>
-<span><span class="co">#&gt; Intercept 0.1317424 0.3629634</span></span>
-<span><span class="co">#&gt; === Phi: 17.12996</span></span>
-<span><span class="co">#&gt; === Log-verosimilitud marginal (importance sampling): -4542.953</span></span></code></pre></div>
+<span><span class="co">#&gt; Intercept 0.1284076 0.3583401</span></span>
+<span><span class="co">#&gt; === Phi: 17.00548</span></span>
+<span><span class="co">#&gt; === Log-verosimilitud marginal (importance sampling): -4542.357</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="ajustar-varios-taxones-de-un-data-frame">Ajustar varios taxones de un data frame<a class="anchor" aria-label="anchor" href="#ajustar-varios-taxones-de-un-data-frame"></a>
@@ -263,11 +272,11 @@ vez:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">fits</span>, <span class="va">coef</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           Taxon1      Taxon2     Taxon3</span></span>
 <span><span class="co">#&gt; [1,]  0.05587996  0.13111349 -0.0423997</span></span>
-<span><span class="co">#&gt; [2,] 20.24932804 19.57832672 21.0280064</span></span>
-<span><span class="co">#&gt; [3,]  3.06101238  3.01938273  3.1301032</span></span>
+<span><span class="co">#&gt; [2,] 21.50281126 19.57832672 21.0280064</span></span>
+<span><span class="co">#&gt; [3,]  3.16183458  3.01938273  3.1301032</span></span>
 <span><span class="co">#&gt; [4,] -0.63237382 -0.39258341 -0.3906250</span></span>
 <span><span class="co">#&gt; [5,]  0.01704677 -0.08132268 -0.1669231</span></span>
-<span><span class="co">#&gt; [6,]  0.03324854 -0.18405358  0.0821391</span></span></code></pre></div>
+<span><span class="co">#&gt; [6,]  0.03324855 -0.18405358  0.0821391</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="comparar-modelos-anidados-con-una-prueba-de-razon-de-verosimilitudes">Comparar modelos anidados con una prueba de razon de
@@ -288,7 +297,7 @@ un modelo completo contra uno reducido (sin esa covariable) con
 <span></span>
 <span><span class="fu"><a href="../reference/lrt_zibr.html">lrt_zibr</a></span><span class="op">(</span><span class="va">full</span>, <span class="va">reduced</span>, df <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt;    LL_full LL_reduced      LRT df    p_value</span></span>
-<span><span class="co">#&gt; 1 14.64046   12.90933 3.462263  1 0.06278431</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 14.64046   12.90933 3.462264  1 0.06278431</span></span></code></pre></div>
 <p>Para muchos taxones a la vez,
 <code><a href="../reference/lrt_zibr_table.html">lrt_zibr_table()</a></code>/<code><a href="../reference/lrt_zibbmr_table.html">lrt_zibbmr_table()</a></code> arman una
 tabla con una fila por taxon.</p>
@@ -312,13 +321,13 @@ por nombre de columna:</p>
 <span><span class="co">#&gt; == Parte logistica: p_it ==</span></span>
 <span><span class="co">#&gt;              Estimate   Type</span></span>
 <span><span class="co">#&gt; Intercept  0.05587996 Random</span></span>
-<span><span class="co">#&gt; tiempo    20.24932804  Fixed</span></span>
-<span><span class="co">#&gt; grupo      3.06101238  Fixed</span></span>
+<span><span class="co">#&gt; tiempo    21.50281126  Fixed</span></span>
+<span><span class="co">#&gt; grupo      3.16183458  Fixed</span></span>
 <span><span class="co">#&gt; == Parte beta: u_it ==</span></span>
 <span><span class="co">#&gt;              Estimate   Type</span></span>
 <span><span class="co">#&gt; Intercept -0.63237382 Random</span></span>
 <span><span class="co">#&gt; tiempo     0.01704677  Fixed</span></span>
-<span><span class="co">#&gt; grupo      0.03324854  Fixed</span></span>
+<span><span class="co">#&gt; grupo      0.03324855  Fixed</span></span>
 <span><span class="co">#&gt; === Varianzas de efectos aleatorios ===</span></span>
 <span><span class="co">#&gt; == Parte logistica ==</span></span>
 <span><span class="co">#&gt;              Variance   sqrt.Var</span></span>

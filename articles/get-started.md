@@ -68,28 +68,28 @@ head(dat)
 fit <- fit_zibr(
   y = dat$Y, id = dat$Subject, X = dat$X.1, Z = dat$Z.1,
   phi_start = 10, alpha_start = c(-0.2, 0.1), beta_start = c(0.1, 0.1),
-  n_iter = 300, seed = 1, compute_fim = TRUE
+  n_iter = 500, seed = 1, compute_fim = TRUE
 )
 
 fit
 #> ===== Resultados SAEM-ZIBR =====
 #> == Parte logistica: p_it ==
 #>             Estimate   Type
-#> Intercept -0.3399294 Random
-#> X.1        0.5208532  Fixed
+#> Intercept -0.3491779 Random
+#> X.1        0.5266508  Fixed
 #> == Parte beta: u_it ==
 #>             Estimate   Type
-#> Intercept  0.2482872 Random
-#> Z.1       -0.4706505  Fixed
+#> Intercept  0.2616168 Random
+#> Z.1       -0.4927260  Fixed
 #> === Varianzas de efectos aleatorios ===
 #> == Parte logistica ==
 #>            Variance  sqrt.Var
-#> Intercept 0.2364414 0.4862524
+#> Intercept 0.1990679 0.4461702
 #> == Parte beta ==
-#>             Variance sqrt.Var
-#> Intercept 0.09794836 0.312967
-#> === Phi: 15.46839
-#> === Log-verosimilitud marginal (importance sampling): -493.7047
+#>            Variance  sqrt.Var
+#> Intercept 0.1050135 0.3240579
+#> === Phi: 15.72674
+#> === Log-verosimilitud marginal (importance sampling): -493.9268
 ```
 
 El objeto devuelto tiene metodos estandar de R para modelos ajustados:
@@ -97,12 +97,21 @@ El objeto devuelto tiene metodos estandar de R para modelos ajustados:
 ``` r
 
 coef(fit)
-#> [1] -0.3399294  0.5208532  0.2482872 -0.4706505
+#> [1] -0.3491779  0.5266508  0.2616168 -0.4927260
 logLik(fit)
-#> 'log Lik.' -493.7047 (df=7)
+#> 'log Lik.' -493.9268 (df=7)
 se(fit)
-#> [1] 0.20597604 0.22637659 0.03995294 0.05138446 1.44379327 0.05903325 0.03114856
+#> [1] 0.06628286 0.10457177 0.03579351 0.04600874 1.14040691 0.09891814 0.01989323
 ```
+
+> **Nota:** con algunos conjuntos de datos, o con pocas iteraciones, la
+> matriz de informacion de la parte logistica puede quedar mal
+> condicionada y
+> [`se()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/se.md)
+> devolver `NaN` para esos coeficientes. No afecta a las estimaciones
+> (los coeficientes son correctos); solo indica que no se pudo calcular
+> el error estandar de esos terminos. Suele resolverse aumentando
+> `n_iter` o el numero de sujetos.
 
 El metodo [`plot()`](https://rdrr.io/r/graphics/plot.default.html)
 ofrece varios graficos segun el argumento `which`: convergencia del
@@ -172,28 +181,28 @@ fit_counts <- fit_zibbmr(
   y = dat_counts$Y, S = dat_counts$TotalCounts, id = dat_counts$Subject,
   X = dat_counts$X.1, Z = dat_counts$Z.1,
   phi_start = 10, alpha_start = c(-0.2, 0.1), beta_start = c(0.1, 0.1),
-  n_iter = 300, seed = 1, compute_fim = TRUE
+  n_iter = 500, seed = 1, compute_fim = TRUE
 )
 
 fit_counts
 #> ===== Resultados SAEM-ZIBBMR =====
 #> == Parte logistica: p_it ==
 #>             Estimate   Type
-#> Intercept -0.3025037 Random
-#> X.1        0.5129910  Fixed
+#> Intercept -0.3176600 Random
+#> X.1        0.5393887  Fixed
 #> == Parte beta-binomial: u_it ==
 #>             Estimate   Type
-#> Intercept  0.2188075 Random
-#> Z.1       -0.4274006  Fixed
+#> Intercept  0.2233562 Random
+#> Z.1       -0.4379817  Fixed
 #> === Varianzas de efectos aleatorios ===
 #> == Parte logistica ==
 #>            Variance  sqrt.Var
-#> Intercept 0.1791427 0.4232526
+#> Intercept 0.1718038 0.4144922
 #> == Parte beta-binomial ==
 #>            Variance  sqrt.Var
-#> Intercept 0.1317424 0.3629634
-#> === Phi: 17.12996
-#> === Log-verosimilitud marginal (importance sampling): -4542.953
+#> Intercept 0.1284076 0.3583401
+#> === Phi: 17.00548
+#> === Log-verosimilitud marginal (importance sampling): -4542.357
 ```
 
 ## Ajustar varios taxones de un data frame
@@ -226,11 +235,11 @@ fits <- fit_zibr_taxa(
 sapply(fits, coef)
 #>           Taxon1      Taxon2     Taxon3
 #> [1,]  0.05587996  0.13111349 -0.0423997
-#> [2,] 20.24932804 19.57832672 21.0280064
-#> [3,]  3.06101238  3.01938273  3.1301032
+#> [2,] 21.50281126 19.57832672 21.0280064
+#> [3,]  3.16183458  3.01938273  3.1301032
 #> [4,] -0.63237382 -0.39258341 -0.3906250
 #> [5,]  0.01704677 -0.08132268 -0.1669231
-#> [6,]  0.03324854 -0.18405358  0.0821391
+#> [6,]  0.03324855 -0.18405358  0.0821391
 ```
 
 ## Comparar modelos anidados con una prueba de razon de verosimilitudes
@@ -253,7 +262,7 @@ reduced <- fit_zibr_taxon(
 
 lrt_zibr(full, reduced, df = 1)
 #>    LL_full LL_reduced      LRT df    p_value
-#> 1 14.64046   12.90933 3.462263  1 0.06278431
+#> 1 14.64046   12.90933 3.462264  1 0.06278431
 ```
 
 Para muchos taxones a la vez,
@@ -282,13 +291,13 @@ fit_saem_microbiome(
 #> == Parte logistica: p_it ==
 #>              Estimate   Type
 #> Intercept  0.05587996 Random
-#> tiempo    20.24932804  Fixed
-#> grupo      3.06101238  Fixed
+#> tiempo    21.50281126  Fixed
+#> grupo      3.16183458  Fixed
 #> == Parte beta: u_it ==
 #>              Estimate   Type
 #> Intercept -0.63237382 Random
 #> tiempo     0.01704677  Fixed
-#> grupo      0.03324854  Fixed
+#> grupo      0.03324855  Fixed
 #> === Varianzas de efectos aleatorios ===
 #> == Parte logistica ==
 #>              Variance   sqrt.Var
