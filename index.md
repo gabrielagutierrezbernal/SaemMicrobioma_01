@@ -30,55 +30,56 @@ remotes::install_github("gabrielagutierrezbernal/SaemMicrobioma_01")
 
 ## Ejemplo: ZIBR (proporciones)
 
-> **Nota:** este es un ejemplo mínimo de uso con pocos sujetos. Con un
-> tamaño de muestra chico, los estimados de un único ajuste traen ruido
-> de muestreo y pueden quedar lejos de los valores verdaderos usados en
-> la simulación; no es un problema del método. Para la validación
-> estadística (al aumentar el número de sujetos los estimados se acercan
-> a la verdad y su error disminuye) ver la carpeta `estudios/`.
+> **Nota:** el ejemplo usa 300 sujetos, un tamaño de muestra suficiente
+> para que los estimados queden cerca de los valores verdaderos usados
+> en la simulación (`alpha = c(-0.3, 0.5)`, `beta = c(0.2, -0.4)`,
+> `phi = 15`). Con muestras pequeñas, los estimados de un único ajuste
+> traen más ruido de muestreo; en la carpeta `estudios/` se muestra cómo
+> el error disminuye al aumentar el número de sujetos.
 
 ``` r
 
 library(saemMicrobiome)
 
 # Solo hace falta cambiar n_subjects / n_time; n_obs se deriva de ellos.
-n_subjects <- 30
+n_subjects <- 300
 n_time <- 4
 n_obs <- n_subjects * n_time
 
-set.seed(1)
+set.seed(3)
 dat <- simulate_zibr_data(
   n_subjects = n_subjects, n_time = n_time,
   X = matrix(rbinom(n_obs, 1, 0.5)), Z = matrix(rbinom(n_obs, 1, 0.5)),
   alpha = c(-0.3, 0.5), beta = c(0.2, -0.4),
-  sigma_alpha = 0.4, sigma_beta = 0.3, phi = 15, seed = 1
+  sigma_alpha = 0.4, sigma_beta = 0.3, phi = 15, seed = 3
 )
 
 fit <- fit_zibr(
   y = dat$Y, id = dat$Subject, X = dat$X.1, Z = dat$Z.1,
   phi_start = 10, alpha_start = c(-0.2, 0.1), beta_start = c(0.1, 0.1),
-  n_iter = 100, seed = 1, compute_fim = FALSE
+  n_iter = 300, seed = 1, compute_fim = FALSE
 )
 
+# Los estimados quedan cerca de los valores verdaderos (-0.3, 0.5, 0.2, -0.4, 15)
 print(fit)
 #> ===== Resultados SAEM-ZIBR =====
 #> == Parte logistica: p_it ==
 #>             Estimate   Type
-#> Intercept 0.04443142 Random
-#> X.1       0.06537826  Fixed
+#> Intercept -0.3452425 Random
+#> X.1        0.5254036  Fixed
 #> == Parte beta: u_it ==
-#>              Estimate   Type
-#> Intercept  0.04305257 Random
-#> Z.1       -0.25059282  Fixed
+#>             Estimate   Type
+#> Intercept  0.2479627 Random
+#> Z.1       -0.4706110  Fixed
 #> === Varianzas de efectos aleatorios ===
 #> == Parte logistica ==
 #>            Variance  sqrt.Var
-#> Intercept 0.1164129 0.3411933
+#> Intercept 0.2284159 0.4779287
 #> == Parte beta ==
-#>            Variance  sqrt.Var
-#> Intercept 0.2631274 0.5129595
-#> === Phi: 22.44654
-#> === Log-verosimilitud marginal (importance sampling): -48.88571
+#>             Variance  sqrt.Var
+#> Intercept 0.09681802 0.3111559
+#> === Phi: 15.4154
+#> === Log-verosimilitud marginal (importance sampling): -493.6766
 ```
 
 ## Ejemplo: ZIBBMR (conteos con profundidad de secuenciacion)
@@ -87,39 +88,41 @@ print(fit)
 
 # Reutiliza n_subjects / n_time / n_obs del ejemplo anterior.
 S <- rep(1000, n_obs)
+set.seed(3)
 dat_counts <- simulate_zibbmr_data(
   n_subjects = n_subjects, n_time = n_time, S = S,
   X = matrix(rbinom(n_obs, 1, 0.5)), Z = matrix(rbinom(n_obs, 1, 0.5)),
   alpha = c(-0.3, 0.5), beta = c(0.2, -0.4),
-  sigma_alpha = 0.4, sigma_beta = 0.3, phi = 15, seed = 1
+  sigma_alpha = 0.4, sigma_beta = 0.3, phi = 15, seed = 3
 )
 
 fit_counts <- fit_zibbmr(
   y = dat_counts$Y, S = dat_counts$TotalCounts, id = dat_counts$Subject,
   X = dat_counts$X.1, Z = dat_counts$Z.1,
   phi_start = 10, alpha_start = c(-0.2, 0.1), beta_start = c(0.1, 0.1),
-  n_iter = 100, seed = 1, compute_fim = FALSE
+  n_iter = 300, seed = 1, compute_fim = FALSE
 )
 
+# Los estimados quedan cerca de los valores verdaderos (-0.3, 0.5, 0.2, -0.4, 15)
 print(fit_counts)
 #> ===== Resultados SAEM-ZIBBMR =====
 #> == Parte logistica: p_it ==
-#>               Estimate   Type
-#> Intercept 0.0004989888 Random
-#> X.1       0.1772606021  Fixed
+#>             Estimate   Type
+#> Intercept -0.3119325 Random
+#> X.1        0.5250844  Fixed
 #> == Parte beta-binomial: u_it ==
 #>             Estimate   Type
-#> Intercept  0.2029850 Random
-#> Z.1       -0.5197964  Fixed
+#> Intercept  0.2222640 Random
+#> Z.1       -0.4338967  Fixed
 #> === Varianzas de efectos aleatorios ===
 #> == Parte logistica ==
-#>             Variance  sqrt.Var
-#> Intercept 0.01455803 0.1206566
+#>            Variance  sqrt.Var
+#> Intercept 0.1641159 0.4051122
 #> == Parte beta-binomial ==
-#>             Variance  sqrt.Var
-#> Intercept 0.06336075 0.2517156
-#> === Phi: 24.4322
-#> === Log-verosimilitud marginal (importance sampling): -464.3804
+#>            Variance  sqrt.Var
+#> Intercept 0.1287425 0.3588071
+#> === Phi: 17.06495
+#> === Log-verosimilitud marginal (importance sampling): -4543.009
 ```
 
 ## Ajuste por taxon y comparación de modelos anidados

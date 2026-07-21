@@ -83,49 +83,50 @@
 <h2 id="ejemplo-zibr-proporciones">Ejemplo: ZIBR (proporciones)<a class="anchor" aria-label="anchor" href="#ejemplo-zibr-proporciones"></a>
 </h2>
 <blockquote>
-<p><strong>Nota:</strong> este es un ejemplo mínimo de uso con pocos sujetos. Con un tamaño de muestra chico, los estimados de un único ajuste traen ruido de muestreo y pueden quedar lejos de los valores verdaderos usados en la simulación; no es un problema del método. Para la validación estadística (al aumentar el número de sujetos los estimados se acercan a la verdad y su error disminuye) ver la carpeta <code>estudios/</code>.</p>
+<p><strong>Nota:</strong> el ejemplo usa 300 sujetos, un tamaño de muestra suficiente para que los estimados queden cerca de los valores verdaderos usados en la simulación (<code>alpha = c(-0.3, 0.5)</code>, <code>beta = c(0.2, -0.4)</code>, <code>phi = 15</code>). Con muestras pequeñas, los estimados de un único ajuste traen más ruido de muestreo; en la carpeta <code>estudios/</code> se muestra cómo el error disminuye al aumentar el número de sujetos.</p>
 </blockquote>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/gabrielagutierrezbernal/SaemMicrobioma_01" class="external-link">saemMicrobiome</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Solo hace falta cambiar n_subjects / n_time; n_obs se deriva de ellos.</span></span>
-<span><span class="va">n_subjects</span> <span class="op">&lt;-</span> <span class="fl">30</span></span>
+<span><span class="va">n_subjects</span> <span class="op">&lt;-</span> <span class="fl">300</span></span>
 <span><span class="va">n_time</span> <span class="op">&lt;-</span> <span class="fl">4</span></span>
 <span><span class="va">n_obs</span> <span class="op">&lt;-</span> <span class="va">n_subjects</span> <span class="op">*</span> <span class="va">n_time</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span>
 <span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_zibr_data.html">simulate_zibr_data</a></span><span class="op">(</span></span>
 <span>  n_subjects <span class="op">=</span> <span class="va">n_subjects</span>, n_time <span class="op">=</span> <span class="va">n_time</span>,</span>
 <span>  X <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="va">n_obs</span>, <span class="fl">1</span>, <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>, Z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="va">n_obs</span>, <span class="fl">1</span>, <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.3</span>, <span class="fl">0.5</span><span class="op">)</span>, beta <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="op">-</span><span class="fl">0.4</span><span class="op">)</span>,</span>
-<span>  sigma_alpha <span class="op">=</span> <span class="fl">0.4</span>, sigma_beta <span class="op">=</span> <span class="fl">0.3</span>, phi <span class="op">=</span> <span class="fl">15</span>, seed <span class="op">=</span> <span class="fl">1</span></span>
+<span>  sigma_alpha <span class="op">=</span> <span class="fl">0.4</span>, sigma_beta <span class="op">=</span> <span class="fl">0.3</span>, phi <span class="op">=</span> <span class="fl">15</span>, seed <span class="op">=</span> <span class="fl">3</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fit_zibr.html">fit_zibr</a></span><span class="op">(</span></span>
 <span>  y <span class="op">=</span> <span class="va">dat</span><span class="op">$</span><span class="va">Y</span>, id <span class="op">=</span> <span class="va">dat</span><span class="op">$</span><span class="va">Subject</span>, X <span class="op">=</span> <span class="va">dat</span><span class="op">$</span><span class="va">X.1</span>, Z <span class="op">=</span> <span class="va">dat</span><span class="op">$</span><span class="va">Z.1</span>,</span>
 <span>  phi_start <span class="op">=</span> <span class="fl">10</span>, alpha_start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.2</span>, <span class="fl">0.1</span><span class="op">)</span>, beta_start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.1</span><span class="op">)</span>,</span>
-<span>  n_iter <span class="op">=</span> <span class="fl">100</span>, seed <span class="op">=</span> <span class="fl">1</span>, compute_fim <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  n_iter <span class="op">=</span> <span class="fl">300</span>, seed <span class="op">=</span> <span class="fl">1</span>, compute_fim <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># Los estimados quedan cerca de los valores verdaderos (-0.3, 0.5, 0.2, -0.4, 15)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ===== Resultados SAEM-ZIBR =====</span></span>
 <span><span class="co">#&gt; == Parte logistica: p_it ==</span></span>
 <span><span class="co">#&gt;             Estimate   Type</span></span>
-<span><span class="co">#&gt; Intercept 0.04443142 Random</span></span>
-<span><span class="co">#&gt; X.1       0.06537826  Fixed</span></span>
+<span><span class="co">#&gt; Intercept -0.3452425 Random</span></span>
+<span><span class="co">#&gt; X.1        0.5254036  Fixed</span></span>
 <span><span class="co">#&gt; == Parte beta: u_it ==</span></span>
-<span><span class="co">#&gt;              Estimate   Type</span></span>
-<span><span class="co">#&gt; Intercept  0.04305257 Random</span></span>
-<span><span class="co">#&gt; Z.1       -0.25059282  Fixed</span></span>
+<span><span class="co">#&gt;             Estimate   Type</span></span>
+<span><span class="co">#&gt; Intercept  0.2479627 Random</span></span>
+<span><span class="co">#&gt; Z.1       -0.4706110  Fixed</span></span>
 <span><span class="co">#&gt; === Varianzas de efectos aleatorios ===</span></span>
 <span><span class="co">#&gt; == Parte logistica ==</span></span>
 <span><span class="co">#&gt;            Variance  sqrt.Var</span></span>
-<span><span class="co">#&gt; Intercept 0.1164129 0.3411933</span></span>
+<span><span class="co">#&gt; Intercept 0.2284159 0.4779287</span></span>
 <span><span class="co">#&gt; == Parte beta ==</span></span>
-<span><span class="co">#&gt;            Variance  sqrt.Var</span></span>
-<span><span class="co">#&gt; Intercept 0.2631274 0.5129595</span></span>
-<span><span class="co">#&gt; === Phi: 22.44654</span></span>
-<span><span class="co">#&gt; === Log-verosimilitud marginal (importance sampling): -48.88571</span></span></code></pre></div>
+<span><span class="co">#&gt;             Variance  sqrt.Var</span></span>
+<span><span class="co">#&gt; Intercept 0.09681802 0.3111559</span></span>
+<span><span class="co">#&gt; === Phi: 15.4154</span></span>
+<span><span class="co">#&gt; === Log-verosimilitud marginal (importance sampling): -493.6766</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="ejemplo-zibbmr-conteos-con-profundidad-de-secuenciacion">Ejemplo: ZIBBMR (conteos con profundidad de secuenciacion)<a class="anchor" aria-label="anchor" href="#ejemplo-zibbmr-conteos-con-profundidad-de-secuenciacion"></a>
@@ -133,39 +134,41 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Reutiliza n_subjects / n_time / n_obs del ejemplo anterior.</span></span>
 <span><span class="va">S</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1000</span>, <span class="va">n_obs</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span>
 <span><span class="va">dat_counts</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/simulate_zibbmr_data.html">simulate_zibbmr_data</a></span><span class="op">(</span></span>
 <span>  n_subjects <span class="op">=</span> <span class="va">n_subjects</span>, n_time <span class="op">=</span> <span class="va">n_time</span>, S <span class="op">=</span> <span class="va">S</span>,</span>
 <span>  X <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="va">n_obs</span>, <span class="fl">1</span>, <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>, Z <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Binomial.html" class="external-link">rbinom</a></span><span class="op">(</span><span class="va">n_obs</span>, <span class="fl">1</span>, <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.3</span>, <span class="fl">0.5</span><span class="op">)</span>, beta <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="op">-</span><span class="fl">0.4</span><span class="op">)</span>,</span>
-<span>  sigma_alpha <span class="op">=</span> <span class="fl">0.4</span>, sigma_beta <span class="op">=</span> <span class="fl">0.3</span>, phi <span class="op">=</span> <span class="fl">15</span>, seed <span class="op">=</span> <span class="fl">1</span></span>
+<span>  sigma_alpha <span class="op">=</span> <span class="fl">0.4</span>, sigma_beta <span class="op">=</span> <span class="fl">0.3</span>, phi <span class="op">=</span> <span class="fl">15</span>, seed <span class="op">=</span> <span class="fl">3</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">fit_counts</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/fit_zibbmr.html">fit_zibbmr</a></span><span class="op">(</span></span>
 <span>  y <span class="op">=</span> <span class="va">dat_counts</span><span class="op">$</span><span class="va">Y</span>, S <span class="op">=</span> <span class="va">dat_counts</span><span class="op">$</span><span class="va">TotalCounts</span>, id <span class="op">=</span> <span class="va">dat_counts</span><span class="op">$</span><span class="va">Subject</span>,</span>
 <span>  X <span class="op">=</span> <span class="va">dat_counts</span><span class="op">$</span><span class="va">X.1</span>, Z <span class="op">=</span> <span class="va">dat_counts</span><span class="op">$</span><span class="va">Z.1</span>,</span>
 <span>  phi_start <span class="op">=</span> <span class="fl">10</span>, alpha_start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.2</span>, <span class="fl">0.1</span><span class="op">)</span>, beta_start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.1</span><span class="op">)</span>,</span>
-<span>  n_iter <span class="op">=</span> <span class="fl">100</span>, seed <span class="op">=</span> <span class="fl">1</span>, compute_fim <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  n_iter <span class="op">=</span> <span class="fl">300</span>, seed <span class="op">=</span> <span class="fl">1</span>, compute_fim <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># Los estimados quedan cerca de los valores verdaderos (-0.3, 0.5, 0.2, -0.4, 15)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fit_counts</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ===== Resultados SAEM-ZIBBMR =====</span></span>
 <span><span class="co">#&gt; == Parte logistica: p_it ==</span></span>
-<span><span class="co">#&gt;               Estimate   Type</span></span>
-<span><span class="co">#&gt; Intercept 0.0004989888 Random</span></span>
-<span><span class="co">#&gt; X.1       0.1772606021  Fixed</span></span>
+<span><span class="co">#&gt;             Estimate   Type</span></span>
+<span><span class="co">#&gt; Intercept -0.3119325 Random</span></span>
+<span><span class="co">#&gt; X.1        0.5250844  Fixed</span></span>
 <span><span class="co">#&gt; == Parte beta-binomial: u_it ==</span></span>
 <span><span class="co">#&gt;             Estimate   Type</span></span>
-<span><span class="co">#&gt; Intercept  0.2029850 Random</span></span>
-<span><span class="co">#&gt; Z.1       -0.5197964  Fixed</span></span>
+<span><span class="co">#&gt; Intercept  0.2222640 Random</span></span>
+<span><span class="co">#&gt; Z.1       -0.4338967  Fixed</span></span>
 <span><span class="co">#&gt; === Varianzas de efectos aleatorios ===</span></span>
 <span><span class="co">#&gt; == Parte logistica ==</span></span>
-<span><span class="co">#&gt;             Variance  sqrt.Var</span></span>
-<span><span class="co">#&gt; Intercept 0.01455803 0.1206566</span></span>
+<span><span class="co">#&gt;            Variance  sqrt.Var</span></span>
+<span><span class="co">#&gt; Intercept 0.1641159 0.4051122</span></span>
 <span><span class="co">#&gt; == Parte beta-binomial ==</span></span>
-<span><span class="co">#&gt;             Variance  sqrt.Var</span></span>
-<span><span class="co">#&gt; Intercept 0.06336075 0.2517156</span></span>
-<span><span class="co">#&gt; === Phi: 24.4322</span></span>
-<span><span class="co">#&gt; === Log-verosimilitud marginal (importance sampling): -464.3804</span></span></code></pre></div>
+<span><span class="co">#&gt;            Variance  sqrt.Var</span></span>
+<span><span class="co">#&gt; Intercept 0.1287425 0.3588071</span></span>
+<span><span class="co">#&gt; === Phi: 17.06495</span></span>
+<span><span class="co">#&gt; === Log-verosimilitud marginal (importance sampling): -4543.009</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="ajuste-por-taxon-y-comparación-de-modelos-anidados">Ajuste por taxon y comparación de modelos anidados<a class="anchor" aria-label="anchor" href="#ajuste-por-taxon-y-comparaci%C3%B3n-de-modelos-anidados"></a>

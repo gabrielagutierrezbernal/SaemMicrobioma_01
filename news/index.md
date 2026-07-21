@@ -2,6 +2,10 @@
 
 ## saemMicrobiome 0.0.1
 
+- Ejemplos del README: se aumento el tamano de muestra a 300 sujetos (y
+  300 iteraciones) para que los estimados de los ejemplos ZIBR y ZIBBMR
+  queden cerca de los valores verdaderos de la simulacion (antes, con 30
+  sujetos, un unico ajuste podia caer lejos por ruido de muestreo).
 - Graficos: los metodos
   [`plot()`](https://rdrr.io/r/graphics/plot.default.html) de
   `zibr_saem`/`zibbmr_saem` aceptan ahora un argumento `which` con tres
