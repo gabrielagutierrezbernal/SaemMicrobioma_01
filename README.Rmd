@@ -69,7 +69,7 @@ dat <- simulate_zibr_data(
 fit <- fit_zibr(
   y = dat$Y, id = dat$Subject, X = dat$X.1, Z = dat$Z.1,
   phi_start = 10, alpha_start = c(-0.2, 0.1), beta_start = c(0.1, 0.1),
-  n_iter = 300, seed = 1, compute_fim = FALSE
+  n_iter = 500, seed = 1, compute_fim = FALSE
 )
 
 # Los estimados quedan cerca de los valores verdaderos (-0.3, 0.5, 0.2, -0.4, 15)
@@ -100,7 +100,7 @@ fit_counts <- fit_zibbmr(
   y = dat_counts$Y, S = dat_counts$TotalCounts, id = dat_counts$Subject,
   X = dat_counts$X.1, Z = dat_counts$Z.1,
   phi_start = 10, alpha_start = c(-0.2, 0.1), beta_start = c(0.1, 0.1),
-  n_iter = 300, seed = 1, compute_fim = FALSE
+  n_iter = 500, seed = 1, compute_fim = FALSE
 )
 
 # Los estimados quedan cerca de los valores verdaderos (-0.3, 0.5, 0.2, -0.4, 15)
