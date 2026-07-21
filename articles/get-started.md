@@ -126,6 +126,24 @@ plot(fit, which = "aleatorios")     # efectos aleatorios por sujeto
 
 ![](get-started_files/figure-html/zibr-plot-ranef-1.png)
 
+Tambien hay graficos de diagnostico del ajuste: observados vs. predichos
+y residuos (de la parte continua, en las observaciones donde el taxon
+esta presente).
+
+``` r
+
+plot(fit, which = "ajuste")         # observados vs. predichos
+```
+
+![](get-started_files/figure-html/zibr-plot-fit-1.png)
+
+``` r
+
+plot(fit, which = "residuos")       # residuos
+```
+
+![](get-started_files/figure-html/zibr-plot-resid-1.png)
+
 ## El mismo flujo para ZIBBMR (conteos)
 
 Cuando se tiene el conteo de lecturas y el total de lecturas por

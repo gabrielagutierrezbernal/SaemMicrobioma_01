@@ -19,11 +19,30 @@ genera distintos graficos segun `which`:
   distribucion entre sujetos de los efectos aleatorios estimados; la
   linea roja marca la media poblacional.
 
+- `"ajuste"`:
+
+  observados frente a predichos de la parte continua, en las
+  observaciones positivas (el conteo esperado dado presencia, `u * S`),
+  con la recta `y = x` de referencia.
+
+- `"residuos"`:
+
+  residuos de la parte continua (observado menos predicho individual, en
+  observaciones positivas): su dispersion contra el valor predicho y su
+  distribucion.
+
+Los graficos `"ajuste"` y `"residuos"` usan los datos originales que el
+ajuste guarda.
+
 ## Usage
 
 ``` r
 # S3 method for class 'zibbmr_saem'
-plot(x, which = c("convergencia", "coeficientes", "aleatorios"), ...)
+plot(
+  x,
+  which = c("convergencia", "coeficientes", "aleatorios", "ajuste", "residuos"),
+  ...
+)
 ```
 
 ## Arguments
@@ -35,7 +54,8 @@ plot(x, which = c("convergencia", "coeficientes", "aleatorios"), ...)
 
 - which:
 
-  Tipo de grafico: `"convergencia"`, `"coeficientes"` o `"aleatorios"`.
+  Tipo de grafico: `"convergencia"`, `"coeficientes"`, `"aleatorios"`,
+  `"ajuste"` o `"residuos"`.
 
 - ...:
 

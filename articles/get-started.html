@@ -175,6 +175,15 @@ aleatorios.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, which <span class="op">=</span> <span class="st">"aleatorios"</span><span class="op">)</span>     <span class="co"># efectos aleatorios por sujeto</span></span></code></pre></div>
 <p><img src="get-started_files/figure-html/zibr-plot-ranef-1.png" class="r-plt" alt="" width="672"></p>
+<p>Tambien hay graficos de diagnostico del ajuste: observados
+vs. predichos y residuos (de la parte continua, en las observaciones
+donde el taxon esta presente).</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, which <span class="op">=</span> <span class="st">"ajuste"</span><span class="op">)</span>         <span class="co"># observados vs. predichos</span></span></code></pre></div>
+<p><img src="get-started_files/figure-html/zibr-plot-fit-1.png" class="r-plt" alt="" width="576"></p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, which <span class="op">=</span> <span class="st">"residuos"</span><span class="op">)</span>       <span class="co"># residuos</span></span></code></pre></div>
+<p><img src="get-started_files/figure-html/zibr-plot-resid-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level2">
 <h2 id="el-mismo-flujo-para-zibbmr-conteos">El mismo flujo para ZIBBMR (conteos)<a class="anchor" aria-label="anchor" href="#el-mismo-flujo-para-zibbmr-conteos"></a>
@@ -183,7 +192,7 @@ aleatorios.</p>
 muestra, <code><a href="../reference/fit_zibbmr.html">fit_zibbmr()</a></code> modela directamente esa informacion
 con una verosimilitud beta-binomial, en vez de trabajar con la
 proporcion ya dividida:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Reutiliza n_subjects / n_time / n_obs del ejemplo anterior.</span></span>
 <span><span class="va">S</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1000</span>, <span class="va">n_obs</span><span class="op">)</span></span>
 <span><span class="va">dat_counts</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simulate_zibbmr_data.html">simulate_zibbmr_data</a></span><span class="op">(</span></span>
@@ -230,7 +239,7 @@ tener que armar a mano las matrices <code>X</code>/<code>Z</code> para
 cada taxon, y <code><a href="../reference/fit_zibr_taxa.html">fit_zibr_taxa()</a></code>/
 <code><a href="../reference/fit_zibbmr_taxa.html">fit_zibbmr_taxa()</a></code> permiten ajustar varios taxones de una
 vez:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simular_datos_microbioma.html">simular_datos_microbioma</a></span><span class="op">(</span>n_ind <span class="op">=</span> <span class="fl">15</span>, n_time <span class="op">=</span> <span class="fl">4</span>, n_taxa <span class="op">=</span> <span class="fl">3</span>, seed <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sim</span><span class="op">$</span><span class="va">proporcion</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   id tiempo grupo    N Taxon1 Taxon2 Taxon3</span></span>
@@ -262,7 +271,7 @@ verosimilitudes<a class="anchor" aria-label="anchor" href="#comparar-modelos-ani
 <p>Para decidir si una covariable aporta significativamente, se compara
 un modelo completo contra uno reducido (sin esa covariable) con
 <code><a href="../reference/lrt_zibr.html">lrt_zibr()</a></code>/ <code><a href="../reference/lrt_zibbmr.html">lrt_zibbmr()</a></code>:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">full</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/fit_zibr_taxon.html">fit_zibr_taxon</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">sim</span><span class="op">$</span><span class="va">proporcion</span>, taxon <span class="op">=</span> <span class="st">"Taxon1"</span>, id <span class="op">=</span> <span class="st">"id"</span>,</span>
 <span>  covariates <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tiempo"</span>, <span class="st">"grupo"</span><span class="op">)</span>, n_iter <span class="op">=</span> <span class="fl">50</span>, seed <span class="op">=</span> <span class="fl">1</span></span>
@@ -289,7 +298,7 @@ tabla con una fila por taxon.</p>
 segun el argumento <code>modelo</code>, tomando la respuesta, el total
 de lecturas (si aplica) y las covariables directamente de un data frame
 por nombre de columna:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ajustar_modelo_microbioma.html">fit_saem_microbiome</a></span><span class="op">(</span></span>
 <span>  modelo <span class="op">=</span> <span class="st">"zibr"</span>, datos <span class="op">=</span> <span class="va">sim</span><span class="op">$</span><span class="va">proporcion</span>, taxon <span class="op">=</span> <span class="st">"Taxon1"</span>,</span>
 <span>  id <span class="op">=</span> <span class="st">"id"</span>, covariables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"tiempo"</span>, <span class="st">"grupo"</span><span class="op">)</span>, iter <span class="op">=</span> <span class="fl">50</span>, seed <span class="op">=</span> <span class="fl">1</span></span>
