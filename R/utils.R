@@ -332,14 +332,112 @@
   invisible(x)
 }
 
+## Predicciones de la PARTE CONTINUA del modelo (la magnitud dado que el taxon
+## esta presente), usando los datos originales que el ajuste guarda en `x$data`.
+## Se enfoca en la parte continua -no en la marginal E[Y] = p * u- porque en un
+## modelo con inflacion de ceros la prediccion marginal mezcla la masa de
+## probabilidad en cero con la parte continua y no se lee como un diagrama
+## observado-vs-predicho clasico. La media condicional dado presencia es:
+##   ZIBR   : u   (la media de la parte beta, en [0, 1))
+##   ZIBBMR : u * S (el conteo esperado dado presencia, con S = total de lecturas)
+## Devuelve tambien `is_positive` para restringir a las observaciones donde el
+## taxon esta presente, y las versiones poblacional (solo `mu`) e individual
+## (efectos por sujeto, `psi_mean`).
+.saem_predict <- function(x) {
+  d <- x$data
+  if (is.null(d)) {
+    stop("Este ajuste no guardo los datos originales (fue creado con una version ",
+         "anterior del paquete). Vuelve a ajustar el modelo para usar estos graficos.",
+         call. = FALSE)
+  }
+  id <- d$subject_id
+  n_subjects <- nrow(x$psi_mean)
+  beta_cols <- x$n_alpha + seq_len(x$n_beta)
+
+  # psi poblacional: todas las filas iguales a mu (sin desviaciones por sujeto)
+  psi_pop <- matrix(x$mu, nrow = n_subjects, ncol = length(x$mu), byrow = TRUE)
+
+  u_ind <- .saem_linear_prob(x$psi_mean, beta_cols, id, d$z_design)
+  u_pop <- .saem_linear_prob(psi_pop,    beta_cols, id, d$z_design)
+
+  mult <- if (!is.null(d$S)) d$S else 1  # ZIBBMR: total de lecturas por muestra
+
+  list(
+    observed    = d$y,
+    is_positive = d$y != 0,
+    pred_ind    = u_ind * mult,
+    pred_pop    = u_pop * mult
+  )
+}
+
+## Grafico 4: observados vs. predichos de la parte continua, usando solo las
+## observaciones positivas (donde el taxon esta presente). Muestra la prediccion
+## poblacional e individual; la recta roja y = x marca el ajuste perfecto.
+.saem_plot_fit <- function(x) {
+  pr <- .saem_predict(x)
+  pos <- pr$is_positive
+  if (!any(pos)) {
+    message("No hay observaciones positivas que graficar.")
+    return(invisible(x))
+  }
+  obs <- pr$observed[pos]; pi <- pr$pred_ind[pos]; pp <- pr$pred_pop[pos]
+  rng <- range(c(obs, pi, pp), na.rm = TRUE)
+
+  old_par <- graphics::par(no.readonly = TRUE)
+  on.exit(graphics::par(old_par), add = TRUE)
+
+  graphics::plot(pp, obs, xlim = rng, ylim = rng,
+                 xlab = "Predicho (parte continua)", ylab = "Observado",
+                 main = "Observados vs. predichos\n(observaciones positivas)",
+                 pch = 1, col = grDevices::adjustcolor("gray40", 0.5))
+  graphics::points(pi, obs, pch = 19, col = grDevices::adjustcolor("#2166ac", 0.5))
+  graphics::abline(0, 1, col = "red", lwd = 2)
+  graphics::legend("topleft", bty = "n",
+                   pch = c(1, 19, NA), lty = c(NA, NA, 1), lwd = c(NA, NA, 2),
+                   col = c("gray40", "#2166ac", "red"),
+                   legend = c("poblacional", "individual", "y = x"), cex = 0.85)
+  invisible(x)
+}
+
+## Grafico 5: residuos de la parte continua (observado - predicho individual),
+## en las observaciones positivas. Dos paneles: residuos contra el valor
+## predicho, y su distribucion. La referencia roja marca el 0.
+.saem_plot_resid <- function(x) {
+  pr <- .saem_predict(x)
+  pos <- pr$is_positive
+  if (!any(pos)) {
+    message("No hay observaciones positivas que graficar.")
+    return(invisible(x))
+  }
+  pred <- pr$pred_ind[pos]
+  resid <- pr$observed[pos] - pred
+
+  old_par <- graphics::par(no.readonly = TRUE)
+  on.exit(graphics::par(old_par), add = TRUE)
+  graphics::par(mfrow = c(1, 2))
+
+  graphics::plot(pred, resid, xlab = "Predicho (parte continua)",
+                 ylab = "Residuo (obs - pred)", main = "Residuos vs. predicho",
+                 pch = 19, col = grDevices::adjustcolor("black", 0.4))
+  graphics::abline(h = 0, col = "red", lwd = 2)
+
+  graphics::hist(resid, main = "Distribucion de residuos", xlab = "Residuo",
+                 col = "#92c5de", border = "white")
+  graphics::abline(v = 0, col = "red", lwd = 2)
+  invisible(x)
+}
+
 ## Despachador de graficos usado por plot.zibr_saem / plot.zibbmr_saem.
-.saem_plot <- function(x, which = c("convergencia", "coeficientes", "aleatorios"),
+.saem_plot <- function(x, which = c("convergencia", "coeficientes", "aleatorios",
+                                    "ajuste", "residuos"),
                        beta_label = "beta", ...) {
   which <- match.arg(which)
   switch(which,
     convergencia = .saem_plot_trace(x, ...),
     coeficientes = .saem_plot_coef(x, beta_label),
-    aleatorios   = .saem_plot_random(x, beta_label))
+    aleatorios   = .saem_plot_random(x, beta_label),
+    ajuste       = .saem_plot_fit(x),
+    residuos     = .saem_plot_resid(x))
 }
 
 .saem_logLik <- function(object) {

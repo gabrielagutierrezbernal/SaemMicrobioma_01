@@ -4,13 +4,17 @@
 \alias{plot.zibr_saem}
 \title{Graficos de un ajuste ZIBR}
 \usage{
-\method{plot}{zibr_saem}(x, which = c("convergencia", "coeficientes", "aleatorios"), ...)
+\method{plot}{zibr_saem}(
+  x,
+  which = c("convergencia", "coeficientes", "aleatorios", "ajuste", "residuos"),
+  ...
+)
 }
 \arguments{
 \item{x}{Un objeto \code{zibr_saem}, resultado de \code{\link[=fit_zibr]{fit_zibr()}}.}
 
-\item{which}{Tipo de grafico: \code{"convergencia"}, \code{"coeficientes"} o
-\code{"aleatorios"}.}
+\item{which}{Tipo de grafico: \code{"convergencia"}, \code{"coeficientes"},
+\code{"aleatorios"}, \code{"ajuste"} o \code{"residuos"}.}
 
 \item{...}{Argumentos adicionales (no usados por ahora).}
 }
@@ -28,5 +32,15 @@ confianza al 95\% (tipo forest plot). Requiere haber ajustado con
 \code{compute_fim = TRUE} para mostrar los intervalos.}
 \item{\code{"aleatorios"}}{distribucion entre sujetos de los efectos aleatorios
 estimados (uno por sujeto); la linea roja marca la media poblacional.}
+\item{\code{"ajuste"}}{observados frente a predichos de la parte continua, en
+las observaciones positivas (donde el taxon esta presente), con la recta
+\code{y = x} de referencia. Se enfoca en la parte continua porque en un modelo
+con inflacion de ceros la prediccion marginal mezcla la masa en cero.}
+\item{\code{"residuos"}}{residuos de la parte continua (observado menos predicho
+individual, en observaciones positivas): su dispersion contra el valor
+predicho y su distribucion.}
 }
+Los graficos \code{"ajuste"} y \code{"residuos"} usan los datos originales que el
+ajuste guarda; solo estan disponibles para ajustes hechos con una version
+del paquete que los almacena.
 }

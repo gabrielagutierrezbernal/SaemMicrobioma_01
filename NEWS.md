@@ -5,14 +5,17 @@
   cerca de los valores verdaderos de la simulacion (antes, con 30 sujetos, un
   unico ajuste podia caer lejos por ruido de muestreo).
 * Graficos: los metodos `plot()` de `zibr_saem`/`zibbmr_saem` aceptan ahora un
-  argumento `which` con tres tipos de grafico (inspirados en `saemix`):
+  argumento `which` con cinco tipos de grafico (inspirados en `saemix`):
   `"convergencia"` (traza del algoritmo, por defecto y compatible con el
   comportamiento anterior), `"coeficientes"` (coeficientes estimados con
   intervalo de confianza al 95%, tipo forest plot; requiere `compute_fim =
-  TRUE`) y `"aleatorios"` (distribucion entre sujetos de los efectos aleatorios
-  estimados). Ver `estudios/graficos/IDEAS_GRAFICOS.md` para las ideas de
-  graficos (incluyendo los que necesitarian guardar los datos originales:
-  observados vs. predichos, residuos) y ejemplos.
+  TRUE`), `"aleatorios"` (distribucion entre sujetos de los efectos aleatorios
+  estimados), `"ajuste"` (observados vs. predichos de la parte continua) y
+  `"residuos"` (residuos de la parte continua). Ver
+  `estudios/graficos/IDEAS_GRAFICOS.md` para las ideas de graficos y ejemplos.
+* Los ajustes (`fit_zibr()`/`fit_zibbmr()`) guardan ahora los datos originales
+  (respuesta y covariables) en el elemento `data` del objeto, necesarios para
+  los graficos de observados vs. predichos y residuos. No afecta la estimacion.
 * Auditoria de fidelidad metodologica (2026-07-05): se comparo `fit_zibr()`/
   `fit_zibbmr()` contra los scripts originales de John Barrera
   (`jbarrera232/saem-zibr`, `jbarrera232/saem-zibbmr`). El algoritmo SAEM

@@ -15,6 +15,7 @@ Imports:
     MASS,
     stats,
     graphics,
+    grDevices,
     numDeriv,
     Rcpp
 LinkingTo:

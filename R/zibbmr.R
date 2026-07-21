@@ -904,6 +904,11 @@ fit_zibbmr <- function(y, S, id, X = NULL, Z = NULL, zi = TRUE,
     random_index = random_index,
     fisher_stoch = fisher_stoch,
     nobs = n_total,
+    # Datos originales, para poder calcular predicciones y residuos en plot().
+    # No afectan la estimacion; solo se guardan para los graficos. Incluye S
+    # (total de lecturas por muestra), que ZIBBMR necesita para las predicciones.
+    data = list(y = y, S = S, x_design = x_design, z_design = z_design,
+                subject_id = subject_id),
     call = match.call()
   )
 
@@ -1090,16 +1095,25 @@ print.zibbmr_saem <- function(x, ...) {
 #'     intervalos.}
 #'   \item{`"aleatorios"`}{distribucion entre sujetos de los efectos aleatorios
 #'     estimados; la linea roja marca la media poblacional.}
+#'   \item{`"ajuste"`}{observados frente a predichos de la parte continua, en las
+#'     observaciones positivas (el conteo esperado dado presencia, `u * S`), con
+#'     la recta `y = x` de referencia.}
+#'   \item{`"residuos"`}{residuos de la parte continua (observado menos predicho
+#'     individual, en observaciones positivas): su dispersion contra el valor
+#'     predicho y su distribucion.}
 #' }
+#' Los graficos `"ajuste"` y `"residuos"` usan los datos originales que el
+#' ajuste guarda.
 #'
 #' @param x Un objeto `zibbmr_saem`, resultado de [fit_zibbmr()].
-#' @param which Tipo de grafico: `"convergencia"`, `"coeficientes"` o
-#'   `"aleatorios"`.
+#' @param which Tipo de grafico: `"convergencia"`, `"coeficientes"`,
+#'   `"aleatorios"`, `"ajuste"` o `"residuos"`.
 #' @param ... Argumentos adicionales (no usados por ahora).
 #' @return `x`, de forma invisible. Se llama por su efecto secundario de
 #'   graficar.
 #' @export
-plot.zibbmr_saem <- function(x, which = c("convergencia", "coeficientes", "aleatorios"), ...) {
+plot.zibbmr_saem <- function(x, which = c("convergencia", "coeficientes",
+                                          "aleatorios", "ajuste", "residuos"), ...) {
   .saem_plot(x, which = match.arg(which), beta_label = "beta-binomial", ...)
 }
 
