@@ -79,8 +79,20 @@ logLik(fit)
 se(fit)
 ```
 
-```{r zibr-plot, fig.width=7, fig.height=5}
-plot(fit)
+El metodo `plot()` ofrece varios graficos segun el argumento `which`:
+convergencia del algoritmo, coeficientes con intervalo de confianza, y
+distribucion de los efectos aleatorios.
+
+```{r zibr-plot-conv, fig.width=7, fig.height=5}
+plot(fit, which = "convergencia")   # traza del algoritmo (por defecto)
+```
+
+```{r zibr-plot-coef, fig.width=7, fig.height=4}
+plot(fit, which = "coeficientes")   # coeficientes con IC 95%
+```
+
+```{r zibr-plot-ranef, fig.width=7, fig.height=3.5}
+plot(fit, which = "aleatorios")     # efectos aleatorios por sujeto
 ```
 
 ## El mismo flujo para ZIBBMR (conteos)

@@ -1079,15 +1079,28 @@ print.zibbmr_saem <- function(x, ...) {
   .saem_print(x, model_label = "SAEM-ZIBBMR", beta_label = "Parte beta-binomial")
 }
 
-#' Graficar la traza de convergencia de un ajuste ZIBBMR
+#' Graficos de un ajuste ZIBBMR
+#'
+#' Analogo a [plot.zibr_saem()]; genera distintos graficos segun `which`:
+#' \describe{
+#'   \item{`"convergencia"`}{(por defecto) traza iteracion-a-iteracion de los
+#'     parametros, para revisar la convergencia del algoritmo SAEM.}
+#'   \item{`"coeficientes"`}{coeficientes estimados con su intervalo de
+#'     confianza al 95%. Requiere `compute_fim = TRUE` para mostrar los
+#'     intervalos.}
+#'   \item{`"aleatorios"`}{distribucion entre sujetos de los efectos aleatorios
+#'     estimados; la linea roja marca la media poblacional.}
+#' }
 #'
 #' @param x Un objeto `zibbmr_saem`, resultado de [fit_zibbmr()].
-#' @param ... No usado, por compatibilidad con el generico [plot()].
+#' @param which Tipo de grafico: `"convergencia"`, `"coeficientes"` o
+#'   `"aleatorios"`.
+#' @param ... Argumentos adicionales (no usados por ahora).
 #' @return `x`, de forma invisible. Se llama por su efecto secundario de
 #'   graficar.
 #' @export
-plot.zibbmr_saem <- function(x, ...) {
-  .saem_plot_trace(x, ...)
+plot.zibbmr_saem <- function(x, which = c("convergencia", "coeficientes", "aleatorios"), ...) {
+  .saem_plot(x, which = match.arg(which), beta_label = "beta-binomial", ...)
 }
 
 #' Log-verosimilitud marginal de un ajuste ZIBBMR

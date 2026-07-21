@@ -1058,19 +1058,28 @@ print.zibr_saem <- function(x, ...) {
   .saem_print(x, model_label = "SAEM-ZIBR", beta_label = "Parte beta")
 }
 
-#' Graficar la traza de convergencia de un ajuste ZIBR
+#' Graficos de un ajuste ZIBR
 #'
-#' Dibuja la traza iteracion-a-iteracion de los parametros del modelo
-#' (`x$trace`), util para revisar visualmente la convergencia del algoritmo
-#' SAEM.
+#' Genera distintos graficos de diagnostico/resultado segun `which`:
+#' \describe{
+#'   \item{`"convergencia"`}{(por defecto) traza iteracion-a-iteracion de los
+#'     parametros, para revisar la convergencia del algoritmo SAEM.}
+#'   \item{`"coeficientes"`}{coeficientes estimados con su intervalo de
+#'     confianza al 95% (tipo forest plot). Requiere haber ajustado con
+#'     `compute_fim = TRUE` para mostrar los intervalos.}
+#'   \item{`"aleatorios"`}{distribucion entre sujetos de los efectos aleatorios
+#'     estimados (uno por sujeto); la linea roja marca la media poblacional.}
+#' }
 #'
 #' @param x Un objeto `zibr_saem`, resultado de [fit_zibr()].
-#' @param ... No usado, por compatibilidad con el generico [plot()].
+#' @param which Tipo de grafico: `"convergencia"`, `"coeficientes"` o
+#'   `"aleatorios"`.
+#' @param ... Argumentos adicionales (no usados por ahora).
 #' @return `x`, de forma invisible. Se llama por su efecto secundario de
 #'   graficar.
 #' @export
-plot.zibr_saem <- function(x, ...) {
-  .saem_plot_trace(x, ...)
+plot.zibr_saem <- function(x, which = c("convergencia", "coeficientes", "aleatorios"), ...) {
+  .saem_plot(x, which = match.arg(which), beta_label = "beta", ...)
 }
 
 #' Log-verosimilitud marginal de un ajuste ZIBR

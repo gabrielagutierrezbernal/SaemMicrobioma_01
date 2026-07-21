@@ -12,7 +12,9 @@ Hay una carpeta por modelo: `zibr/` (proporciones) y `zibbmr/` (conteos con
 profundidad de secuenciacion). Cada una tiene los mismos tres estudios. Además,
 `comparacion_tiempos/` compara la estimación y los tiempos de cómputo entre el
 código de John y las distintas versiónes del paquete (sin optimizar, con la
-optimización en R puro, y con C++).
+optimización en R puro, y con C++), y `graficos/` documenta los gráficos del
+paquete (ideas inspiradas en `saemix`, qué se puede recuperar de los ajustes y
+ejemplos).
 
 ## `01_comparacion_john_vs_paquete.R`
 

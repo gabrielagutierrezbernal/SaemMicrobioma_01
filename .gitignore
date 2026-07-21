@@ -9,3 +9,5 @@ docs
 src/*.o
 src/*.so
 src/*.dll
+# PNG generados por los scripts de estudios/ si se corren desde la raiz
+/*.png
