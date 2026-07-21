@@ -100,12 +100,31 @@ se(fit)
 #> [1] 0.2058814 0.3469675 0.1631279 0.2155122 6.0893936 0.1129842 0.1250804
 ```
 
+El metodo [`plot()`](https://rdrr.io/r/graphics/plot.default.html)
+ofrece varios graficos segun el argumento `which`: convergencia del
+algoritmo, coeficientes con intervalo de confianza, y distribucion de
+los efectos aleatorios.
+
 ``` r
 
-plot(fit)
+plot(fit, which = "convergencia")   # traza del algoritmo (por defecto)
 ```
 
-![](get-started_files/figure-html/zibr-plot-1.png)
+![](get-started_files/figure-html/zibr-plot-conv-1.png)
+
+``` r
+
+plot(fit, which = "coeficientes")   # coeficientes con IC 95%
+```
+
+![](get-started_files/figure-html/zibr-plot-coef-1.png)
+
+``` r
+
+plot(fit, which = "aleatorios")     # efectos aleatorios por sujeto
+```
+
+![](get-started_files/figure-html/zibr-plot-ranef-1.png)
 
 ## El mismo flujo para ZIBBMR (conteos)
 

@@ -2,6 +2,17 @@
 
 ## saemMicrobiome 0.0.1
 
+- Graficos: los metodos
+  [`plot()`](https://rdrr.io/r/graphics/plot.default.html) de
+  `zibr_saem`/`zibbmr_saem` aceptan ahora un argumento `which` con tres
+  tipos de grafico (inspirados en `saemix`): `"convergencia"` (traza del
+  algoritmo, por defecto y compatible con el comportamiento anterior),
+  `"coeficientes"` (coeficientes estimados con intervalo de confianza al
+  95%, tipo forest plot; requiere `compute_fim = TRUE`) y `"aleatorios"`
+  (distribucion entre sujetos de los efectos aleatorios estimados). Ver
+  `estudios/graficos/IDEAS_GRAFICOS.md` para las ideas de graficos
+  (incluyendo los que necesitarian guardar los datos originales:
+  observados vs. predichos, residuos) y ejemplos.
 - Auditoria de fidelidad metodologica (2026-07-05): se comparo
   [`fit_zibr()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/fit_zibr.md)/
   [`fit_zibbmr()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/fit_zibbmr.md)

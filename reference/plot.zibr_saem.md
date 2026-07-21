@@ -1,14 +1,28 @@
-# Graficar la traza de convergencia de un ajuste ZIBR
+# Graficos de un ajuste ZIBR
 
-Dibuja la traza iteracion-a-iteracion de los parametros del modelo
-(`x$trace`), util para revisar visualmente la convergencia del algoritmo
-SAEM.
+Genera distintos graficos de diagnostico/resultado segun `which`:
+
+- `"convergencia"`:
+
+  (por defecto) traza iteracion-a-iteracion de los parametros, para
+  revisar la convergencia del algoritmo SAEM.
+
+- `"coeficientes"`:
+
+  coeficientes estimados con su intervalo de confianza al 95% (tipo
+  forest plot). Requiere haber ajustado con `compute_fim = TRUE` para
+  mostrar los intervalos.
+
+- `"aleatorios"`:
+
+  distribucion entre sujetos de los efectos aleatorios estimados (uno
+  por sujeto); la linea roja marca la media poblacional.
 
 ## Usage
 
 ``` r
 # S3 method for class 'zibr_saem'
-plot(x, ...)
+plot(x, which = c("convergencia", "coeficientes", "aleatorios"), ...)
 ```
 
 ## Arguments
@@ -18,10 +32,13 @@ plot(x, ...)
   Un objeto `zibr_saem`, resultado de
   [`fit_zibr()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/fit_zibr.md).
 
+- which:
+
+  Tipo de grafico: `"convergencia"`, `"coeficientes"` o `"aleatorios"`.
+
 - ...:
 
-  No usado, por compatibilidad con el generico
-  [`plot()`](https://rdrr.io/r/graphics/plot.default.html).
+  Argumentos adicionales (no usados por ahora).
 
 ## Value
 

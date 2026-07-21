@@ -207,7 +207,7 @@ Funciones principales para ajustar ZIBR y ZIBBMR.
 - [`print(`*`<zibr_saem>`*`)`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/print.zibr_saem.md)
   : Imprimir un ajuste ZIBR
 - [`plot(`*`<zibr_saem>`*`)`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/plot.zibr_saem.md)
-  : Graficar la traza de convergencia de un ajuste ZIBR
+  : Graficos de un ajuste ZIBR
 - [`coef(`*`<zibr_saem>`*`)`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/coef.zibr_saem.md)
   : Coeficientes estimados de un ajuste ZIBR
 - [`vcov(`*`<zibr_saem>`*`)`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/vcov.zibr_saem.md)
@@ -217,7 +217,7 @@ Funciones principales para ajustar ZIBR y ZIBBMR.
 - [`print(`*`<zibbmr_saem>`*`)`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/print.zibbmr_saem.md)
   : Imprimir un ajuste ZIBBMR
 - [`plot(`*`<zibbmr_saem>`*`)`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/plot.zibbmr_saem.md)
-  : Graficar la traza de convergencia de un ajuste ZIBBMR
+  : Graficos de un ajuste ZIBBMR
 - [`coef(`*`<zibbmr_saem>`*`)`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/coef.zibbmr_saem.md)
   : Coeficientes estimados de un ajuste ZIBBMR
 - [`vcov(`*`<zibbmr_saem>`*`)`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/vcov.zibbmr_saem.md)
