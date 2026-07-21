@@ -130,6 +130,26 @@ test_that("metodos S3 de zibr_saem devuelven la estructura esperada", {
   expect_no_error(plot(fit))
 })
 
+test_that("los tres tipos de grafico de zibr_saem se generan sin error", {
+  dat <- simulate_zibr_data(
+    n_subjects = 20, n_time = 3, alpha = c(-0.2, 0.3), beta = c(0.1, -0.2),
+    sigma_alpha = 0.3, sigma_beta = 0.2, phi = 12,
+    X = matrix(rbinom(60, 1, 0.5)), Z = matrix(rbinom(60, 1, 0.5)), seed = 3
+  )
+  fit <- fit_zibr(
+    y = dat$Y, id = dat$Subject, X = dat$X.1, Z = dat$Z.1,
+    phi_start = 10, alpha_start = c(-0.1, 0.1), beta_start = c(0.1, 0.1),
+    n_iter = 20, seed = 3, compute_fim = TRUE
+  )
+
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off())
+  expect_no_error(plot(fit, which = "convergencia"))
+  expect_no_error(suppressWarnings(plot(fit, which = "coeficientes")))
+  expect_no_error(plot(fit, which = "aleatorios"))
+  expect_error(plot(fit, which = "otro"))
+})
+
 test_that("vcov.zibr_saem exige haber ajustado con compute_fim = TRUE", {
   dat <- simulate_zibr_data(
     n_subjects = 10, n_time = 3, alpha = c(-0.2, 0.3), beta = c(0.1, -0.2),

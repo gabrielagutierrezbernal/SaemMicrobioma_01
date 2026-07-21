@@ -234,6 +234,17 @@
   invisible(x)
 }
 
+## Etiquetas de los parametros de efectos fijos (parte logistica + parte
+## beta/beta-binomial), en el mismo orden que x$mu.
+.saem_param_labels <- function(x, beta_label = "beta") {
+  labs <- character(0)
+  if (isTRUE(x$zi) && x$n_alpha > 0) {
+    labs <- paste0("logistica: ", x$alpha_labels)
+  }
+  c(labs, paste0(beta_label, ": ", x$beta_labels))
+}
+
+## Grafico 1: traza de convergencia (parametros a lo largo de las iteraciones).
 .saem_plot_trace <- function(x, ...) {
   trace <- x$trace
   n_iter <- nrow(trace)
@@ -258,6 +269,77 @@
   }
 
   invisible(x)
+}
+
+## Grafico 2: coeficientes estimados con intervalo de confianza al 95%
+## (tipo "forest plot"). Necesita el ajuste con compute_fim = TRUE para los IC.
+.saem_plot_coef <- function(x, beta_label = "beta") {
+  est <- x$mu
+  labs <- .saem_param_labels(x, beta_label)
+  se_all <- tryCatch(suppressWarnings(.saem_se(x)), error = function(e) NULL)
+  se_coef <- if (!is.null(se_all) && length(se_all) >= length(est)) {
+    se_all[seq_along(est)]
+  } else {
+    rep(NA_real_, length(est))
+  }
+  lo <- est - 1.96 * se_coef
+  hi <- est + 1.96 * se_coef
+  n <- length(est)
+
+  old_par <- graphics::par(no.readonly = TRUE)
+  on.exit(graphics::par(old_par), add = TRUE)
+  graphics::par(mar = c(4, 12, 3, 1))
+
+  xr <- range(c(est, lo, hi, 0), na.rm = TRUE)
+  graphics::plot(est, seq_len(n), xlim = xr, ylim = c(0.5, n + 0.5), yaxt = "n",
+                 xlab = "Estimado (IC 95%)", ylab = "", pch = 19,
+                 main = "Coeficientes estimados")
+  graphics::axis(2, at = seq_len(n), labels = labs, las = 1, cex.axis = 0.85)
+  graphics::abline(v = 0, lty = 2, col = "gray50")
+  ok <- !is.na(lo)
+  if (any(ok)) graphics::segments(lo[ok], which(ok), hi[ok], which(ok), lwd = 2)
+  if (!all(ok)) {
+    aviso <- if (is.null(x$fisher_stoch)) {
+      "Sin IC: reajusta con compute_fim = TRUE"
+    } else {
+      "IC no disponible para algun coeficiente (matriz de informacion mal condicionada)"
+    }
+    graphics::mtext(aviso, side = 1, line = 2.5, cex = 0.75, col = "gray40")
+  }
+  invisible(x)
+}
+
+## Grafico 3: distribucion entre sujetos de los efectos aleatorios estimados
+## (uno por sujeto). La linea roja marca la media poblacional.
+.saem_plot_random <- function(x, beta_label = "beta") {
+  ri <- x$random_index
+  if (length(ri) == 0) {
+    message("El ajuste no tiene efectos aleatorios que graficar.")
+    return(invisible(x))
+  }
+  labs <- .saem_param_labels(x, beta_label)[ri]
+  vals <- x$psi_mean[, ri, drop = FALSE]
+  k <- ncol(vals)
+
+  old_par <- graphics::par(no.readonly = TRUE)
+  on.exit(graphics::par(old_par), add = TRUE)
+  graphics::par(mfrow = c(1, k))
+  for (j in seq_len(k)) {
+    graphics::hist(vals[, j], main = labs[j], xlab = "Valor por sujeto",
+                   col = "#92c5de", border = "white")
+    graphics::abline(v = x$mu[ri[j]], col = "red", lwd = 2)
+  }
+  invisible(x)
+}
+
+## Despachador de graficos usado por plot.zibr_saem / plot.zibbmr_saem.
+.saem_plot <- function(x, which = c("convergencia", "coeficientes", "aleatorios"),
+                       beta_label = "beta", ...) {
+  which <- match.arg(which)
+  switch(which,
+    convergencia = .saem_plot_trace(x, ...),
+    coeficientes = .saem_plot_coef(x, beta_label),
+    aleatorios   = .saem_plot_random(x, beta_label))
 }
 
 .saem_logLik <- function(object) {

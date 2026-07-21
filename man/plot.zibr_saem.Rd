@@ -2,21 +2,31 @@
 % Please edit documentation in R/zibr.R
 \name{plot.zibr_saem}
 \alias{plot.zibr_saem}
-\title{Graficar la traza de convergencia de un ajuste ZIBR}
+\title{Graficos de un ajuste ZIBR}
 \usage{
-\method{plot}{zibr_saem}(x, ...)
+\method{plot}{zibr_saem}(x, which = c("convergencia", "coeficientes", "aleatorios"), ...)
 }
 \arguments{
 \item{x}{Un objeto \code{zibr_saem}, resultado de \code{\link[=fit_zibr]{fit_zibr()}}.}
 
-\item{...}{No usado, por compatibilidad con el generico \code{\link[=plot]{plot()}}.}
+\item{which}{Tipo de grafico: \code{"convergencia"}, \code{"coeficientes"} o
+\code{"aleatorios"}.}
+
+\item{...}{Argumentos adicionales (no usados por ahora).}
 }
 \value{
 \code{x}, de forma invisible. Se llama por su efecto secundario de
 graficar.
 }
 \description{
-Dibuja la traza iteracion-a-iteracion de los parametros del modelo
-(\code{x$trace}), util para revisar visualmente la convergencia del algoritmo
-SAEM.
+Genera distintos graficos de diagnostico/resultado segun \code{which}:
+\describe{
+\item{\code{"convergencia"}}{(por defecto) traza iteracion-a-iteracion de los
+parametros, para revisar la convergencia del algoritmo SAEM.}
+\item{\code{"coeficientes"}}{coeficientes estimados con su intervalo de
+confianza al 95\% (tipo forest plot). Requiere haber ajustado con
+\code{compute_fim = TRUE} para mostrar los intervalos.}
+\item{\code{"aleatorios"}}{distribucion entre sujetos de los efectos aleatorios
+estimados (uno por sujeto); la linea roja marca la media poblacional.}
+}
 }
