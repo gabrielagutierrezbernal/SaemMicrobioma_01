@@ -131,6 +131,9 @@
 <div class="section level2">
 <h2 id="ejemplo-zibbmr-conteos-con-profundidad-de-secuenciacion">Ejemplo: ZIBBMR (conteos con profundidad de secuenciacion)<a class="anchor" aria-label="anchor" href="#ejemplo-zibbmr-conteos-con-profundidad-de-secuenciacion"></a>
 </h2>
+<blockquote>
+<p><strong>Nota:</strong> al igual que en el ejemplo ZIBR, se usan 300 sujetos, un tamaño de muestra suficiente para que los estimados queden cerca de los valores verdaderos usados en la simulación (<code>alpha = c(-0.3, 0.5)</code>, <code>beta = c(0.2, -0.4)</code>, <code>phi = 15</code>). Con muestras pequeñas, los estimados de un único ajuste traen más ruido de muestreo; en la carpeta <code>estudios/</code> se muestra cómo el error disminuye al aumentar el número de sujetos.</p>
+</blockquote>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Reutiliza n_subjects / n_time / n_obs del ejemplo anterior.</span></span>
 <span><span class="va">S</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1000</span>, <span class="va">n_obs</span><span class="op">)</span></span>
