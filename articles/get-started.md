@@ -37,55 +37,59 @@ John Barrera:
 
 ## Simular datos y ajustar un modelo ZIBR
 
+Se usan 300 sujetos, un tamano de muestra suficiente para que los
+estimados queden cerca de los valores verdaderos de la simulacion
+(`alpha = c(-0.3, 0.5)`, `beta = c(0.2, -0.4)`, `phi = 15`).
+
 ``` r
 
 # Solo hace falta cambiar n_subjects / n_time; n_obs se deriva de ellos.
-n_subjects <- 30
+n_subjects <- 300
 n_time <- 4
 n_obs <- n_subjects * n_time
 
-set.seed(1)
+set.seed(3)
 dat <- simulate_zibr_data(
   n_subjects = n_subjects, n_time = n_time,
   X = matrix(rbinom(n_obs, 1, 0.5)), Z = matrix(rbinom(n_obs, 1, 0.5)),
   alpha = c(-0.3, 0.5), beta = c(0.2, -0.4),
-  sigma_alpha = 0.4, sigma_beta = 0.3, phi = 15, seed = 1
+  sigma_alpha = 0.4, sigma_beta = 0.3, phi = 15, seed = 3
 )
 
 head(dat)
 #>     Subject Time         Y X.1 Z.1
-#> 1 Subject.1    1 0.0000000   0   1
-#> 2 Subject.1    2 0.0000000   0   0
-#> 3 Subject.1    3 0.0000000   1   0
-#> 4 Subject.1    4 0.3419259   1   0
-#> 5 Subject.2    1 0.0000000   0   1
-#> 6 Subject.2    2 0.5880479   1   0
+#> 1 Subject.1    1 0.0000000   0   0
+#> 2 Subject.1    2 0.0000000   1   1
+#> 3 Subject.1    3 0.4542274   0   1
+#> 4 Subject.1    4 0.4858550   0   0
+#> 5 Subject.2    1 0.0000000   1   0
+#> 6 Subject.2    2 0.4464711   1   1
 
 fit <- fit_zibr(
   y = dat$Y, id = dat$Subject, X = dat$X.1, Z = dat$Z.1,
   phi_start = 10, alpha_start = c(-0.2, 0.1), beta_start = c(0.1, 0.1),
-  n_iter = 100, seed = 1, compute_fim = TRUE
+  n_iter = 300, seed = 1, compute_fim = TRUE
 )
 
 fit
 #> ===== Resultados SAEM-ZIBR =====
 #> == Parte logistica: p_it ==
-#>              Estimate   Type
-#> Intercept 0.009898927 Random
-#> X.1       0.101047754  Fixed
+#>             Estimate   Type
+#> Intercept -0.3399294 Random
+#> X.1        0.5208532  Fixed
 #> == Parte beta: u_it ==
-#>              Estimate   Type
-#> Intercept  0.05792314 Random
-#> Z.1       -0.28304003  Fixed
+#>             Estimate   Type
+#> Intercept  0.2482872 Random
+#> Z.1       -0.4706505  Fixed
 #> === Varianzas de efectos aleatorios ===
 #> == Parte logistica ==
-#>             Variance  sqrt.Var
-#> Intercept 0.09888517 0.3144601
-#> == Parte beta ==
 #>            Variance  sqrt.Var
-#> Intercept 0.2673807 0.5170887
-#> === Phi: 22.66785
-#> === Log-verosimilitud marginal (importance sampling): -48.69255
+#> Intercept 0.2364414 0.4862524
+#> == Parte beta ==
+#>             Variance sqrt.Var
+#> Intercept 0.09794836 0.312967
+#> === Phi: 15.46839
+#> === Log-verosimilitud marginal (importance sampling): -493.7047
 ```
 
 El objeto devuelto tiene metodos estandar de R para modelos ajustados:
@@ -93,11 +97,11 @@ El objeto devuelto tiene metodos estandar de R para modelos ajustados:
 ``` r
 
 coef(fit)
-#> [1]  0.009898927  0.101047754  0.057923135 -0.283040031
+#> [1] -0.3399294  0.5208532  0.2482872 -0.4706505
 logLik(fit)
-#> 'log Lik.' -48.69255 (df=7)
+#> 'log Lik.' -493.7047 (df=7)
 se(fit)
-#> [1] 0.2058814 0.3469675 0.1631279 0.2155122 6.0893936 0.1129842 0.1250804
+#> [1] 0.20597604 0.22637659 0.03995294 0.05138446 1.44379327 0.05903325 0.03114856
 ```
 
 El metodo [`plot()`](https://rdrr.io/r/graphics/plot.default.html)
@@ -156,39 +160,40 @@ en vez de trabajar con la proporcion ya dividida:
 
 # Reutiliza n_subjects / n_time / n_obs del ejemplo anterior.
 S <- rep(1000, n_obs)
+set.seed(3)
 dat_counts <- simulate_zibbmr_data(
   n_subjects = n_subjects, n_time = n_time, S = S,
   X = matrix(rbinom(n_obs, 1, 0.5)), Z = matrix(rbinom(n_obs, 1, 0.5)),
   alpha = c(-0.3, 0.5), beta = c(0.2, -0.4),
-  sigma_alpha = 0.4, sigma_beta = 0.3, phi = 15, seed = 1
+  sigma_alpha = 0.4, sigma_beta = 0.3, phi = 15, seed = 3
 )
 
 fit_counts <- fit_zibbmr(
   y = dat_counts$Y, S = dat_counts$TotalCounts, id = dat_counts$Subject,
   X = dat_counts$X.1, Z = dat_counts$Z.1,
   phi_start = 10, alpha_start = c(-0.2, 0.1), beta_start = c(0.1, 0.1),
-  n_iter = 100, seed = 1, compute_fim = FALSE
+  n_iter = 300, seed = 1, compute_fim = FALSE
 )
 
 fit_counts
 #> ===== Resultados SAEM-ZIBBMR =====
 #> == Parte logistica: p_it ==
 #>             Estimate   Type
-#> Intercept 0.01232391 Random
-#> X.1       0.16159293  Fixed
+#> Intercept -0.3025037 Random
+#> X.1        0.5129910  Fixed
 #> == Parte beta-binomial: u_it ==
 #>             Estimate   Type
-#> Intercept  0.1988194 Random
-#> Z.1       -0.5146478  Fixed
+#> Intercept  0.2188075 Random
+#> Z.1       -0.4274006  Fixed
 #> === Varianzas de efectos aleatorios ===
 #> == Parte logistica ==
-#>             Variance  sqrt.Var
-#> Intercept 0.01775188 0.1332362
+#>            Variance  sqrt.Var
+#> Intercept 0.1791427 0.4232526
 #> == Parte beta-binomial ==
-#>             Variance  sqrt.Var
-#> Intercept 0.06562225 0.2561684
-#> === Phi: 24.4826
-#> === Log-verosimilitud marginal (importance sampling): -464.5139
+#>            Variance  sqrt.Var
+#> Intercept 0.1317424 0.3629634
+#> === Phi: 17.12996
+#> === Log-verosimilitud marginal (importance sampling): -4542.953
 ```
 
 ## Ajustar varios taxones de un data frame
