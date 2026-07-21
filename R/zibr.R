@@ -896,6 +896,10 @@ fit_zibr <- function(y, id, X = NULL, Z = NULL, zi = TRUE,
     random_index = random_index,
     fisher_stoch = fisher_stoch,
     nobs = n_total,
+    # Datos originales, para poder calcular predicciones y residuos en plot().
+    # No afectan la estimacion; solo se guardan para los graficos.
+    data = list(y = y, x_design = x_design, z_design = z_design,
+                subject_id = subject_id),
     call = match.call()
   )
 
@@ -1069,16 +1073,27 @@ print.zibr_saem <- function(x, ...) {
 #'     `compute_fim = TRUE` para mostrar los intervalos.}
 #'   \item{`"aleatorios"`}{distribucion entre sujetos de los efectos aleatorios
 #'     estimados (uno por sujeto); la linea roja marca la media poblacional.}
+#'   \item{`"ajuste"`}{observados frente a predichos de la parte continua, en
+#'     las observaciones positivas (donde el taxon esta presente), con la recta
+#'     `y = x` de referencia. Se enfoca en la parte continua porque en un modelo
+#'     con inflacion de ceros la prediccion marginal mezcla la masa en cero.}
+#'   \item{`"residuos"`}{residuos de la parte continua (observado menos predicho
+#'     individual, en observaciones positivas): su dispersion contra el valor
+#'     predicho y su distribucion.}
 #' }
+#' Los graficos `"ajuste"` y `"residuos"` usan los datos originales que el
+#' ajuste guarda; solo estan disponibles para ajustes hechos con una version
+#' del paquete que los almacena.
 #'
 #' @param x Un objeto `zibr_saem`, resultado de [fit_zibr()].
-#' @param which Tipo de grafico: `"convergencia"`, `"coeficientes"` o
-#'   `"aleatorios"`.
+#' @param which Tipo de grafico: `"convergencia"`, `"coeficientes"`,
+#'   `"aleatorios"`, `"ajuste"` o `"residuos"`.
 #' @param ... Argumentos adicionales (no usados por ahora).
 #' @return `x`, de forma invisible. Se llama por su efecto secundario de
 #'   graficar.
 #' @export
-plot.zibr_saem <- function(x, which = c("convergencia", "coeficientes", "aleatorios"), ...) {
+plot.zibr_saem <- function(x, which = c("convergencia", "coeficientes",
+                                        "aleatorios", "ajuste", "residuos"), ...) {
   .saem_plot(x, which = match.arg(which), beta_label = "beta", ...)
 }
 

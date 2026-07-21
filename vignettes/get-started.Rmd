@@ -95,6 +95,18 @@ plot(fit, which = "coeficientes")   # coeficientes con IC 95%
 plot(fit, which = "aleatorios")     # efectos aleatorios por sujeto
 ```
 
+Tambien hay graficos de diagnostico del ajuste: observados vs. predichos y
+residuos (de la parte continua, en las observaciones donde el taxon esta
+presente).
+
+```{r zibr-plot-fit, fig.width=6, fig.height=5}
+plot(fit, which = "ajuste")         # observados vs. predichos
+```
+
+```{r zibr-plot-resid, fig.width=7, fig.height=3.5}
+plot(fit, which = "residuos")       # residuos
+```
+
 ## El mismo flujo para ZIBBMR (conteos)
 
 Cuando se tiene el conteo de lecturas y el total de lecturas por muestra,

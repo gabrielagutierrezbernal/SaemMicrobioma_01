@@ -26,20 +26,26 @@ En saemix se piden con `plot(ajuste, plot.type = "...")`. Los principales:
 
 Cada ajuste (`fit_zibr()` / `fit_zibbmr()`) guarda: la traza de los parametros
 por iteracion (`trace`), los coeficientes estimados (`mu`) y su matriz de
-informacion (`fisher_stoch`, si se ajusto con `compute_fim = TRUE`), y los
-efectos aleatorios estimados por sujeto (`psi_mean`). Con eso ya se pueden
-generar tres graficos utiles:
+informacion (`fisher_stoch`, si se ajusto con `compute_fim = TRUE`), los
+efectos aleatorios estimados por sujeto (`psi_mean`) y los datos originales
+(respuesta y covariables, en `data`). Con eso se pueden generar cinco graficos:
 
 | Grafico | Basado en saemix | Disponible | Datos que usa |
 |---------|------------------|------------|---------------|
-| Convergencia            | "convergence"        | Si | `trace` |
-| Coeficientes con IC 95% | (resumen de efectos) | Si | `mu`, `fisher_stoch` |
-| Efectos aleatorios      | "random.effects"     | Si | `psi_mean` |
+| Convergencia            | "convergence"                 | Si | `trace` |
+| Coeficientes con IC 95% | (resumen de efectos)          | Si | `mu`, `fisher_stoch` |
+| Efectos aleatorios      | "random.effects"              | Si | `psi_mean` |
+| Observados vs. predichos| "observations.vs.predictions" | Si | `psi_mean`, `mu`, `data` |
+| Residuos                | "residuals.scatter/distribution" | Si | `psi_mean`, `data` |
 
-Los graficos que necesitan los **datos originales** (observados vs. predichos,
-residuos, ajustes individuales, spaghetti de datos) requieren guardar en el
-ajuste la respuesta y las covariables, que hoy no se almacenan. Quedan como
-posible extension futura.
+Nota sobre observados vs. predichos y residuos en modelos con inflacion de
+ceros: se enfocan en la **parte continua** (la magnitud dado que el taxon esta
+presente), usando solo las observaciones positivas. Es lo interpretable, porque
+la prediccion marginal `E[Y] = p * u` mezcla la masa de probabilidad en cero con
+la parte continua y no se lee como un diagrama observado-vs-predicho clasico.
+
+Otros graficos de saemix (ajustes individuales por sujeto a lo largo del tiempo,
+VPC/npde) quedan como posible extension futura.
 
 ## 3. Como los genera el usuario
 
@@ -50,6 +56,8 @@ fit <- fit_zibr(...)                # o fit_zibbmr(...), con compute_fim = TRUE
 plot(fit, which = "convergencia")   # convergencia del algoritmo (por defecto)
 plot(fit, which = "coeficientes")   # coeficientes con intervalo de confianza
 plot(fit, which = "aleatorios")     # distribucion de los efectos aleatorios
+plot(fit, which = "ajuste")         # observados vs. predichos (parte continua)
+plot(fit, which = "residuos")       # residuos de la parte continua
 ```
 
 Para guardarlos como imagen:
@@ -76,3 +84,13 @@ Distribucion entre sujetos de los efectos aleatorios (uno por sujeto); la linea
 roja marca la media poblacional:
 
 ![Efectos aleatorios](03_aleatorios.png)
+
+Observados vs. predichos de la parte continua (observaciones positivas); la
+recta roja `y = x` marca el ajuste perfecto:
+
+![Observados vs. predichos](04_ajuste.png)
+
+Residuos de la parte continua: dispersion contra el valor predicho y su
+distribucion (la referencia roja marca el 0):
+
+![Residuos](05_residuos.png)

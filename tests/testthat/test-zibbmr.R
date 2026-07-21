@@ -117,6 +117,8 @@ test_that("los tres tipos de grafico de zibbmr_saem se generan sin error", {
   expect_no_error(plot(fit, which = "convergencia"))
   expect_no_error(suppressWarnings(plot(fit, which = "coeficientes")))
   expect_no_error(plot(fit, which = "aleatorios"))
+  expect_no_error(plot(fit, which = "ajuste"))
+  expect_no_error(plot(fit, which = "residuos"))
 })
 
 test_that("vcov.zibbmr_saem exige haber ajustado con compute_fim = TRUE", {

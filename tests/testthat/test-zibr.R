@@ -147,7 +147,26 @@ test_that("los tres tipos de grafico de zibr_saem se generan sin error", {
   expect_no_error(plot(fit, which = "convergencia"))
   expect_no_error(suppressWarnings(plot(fit, which = "coeficientes")))
   expect_no_error(plot(fit, which = "aleatorios"))
+  expect_no_error(plot(fit, which = "ajuste"))
+  expect_no_error(plot(fit, which = "residuos"))
   expect_error(plot(fit, which = "otro"))
+})
+
+test_that("plot 'ajuste'/'residuos' avisan si el ajuste no guardo los datos", {
+  dat <- simulate_zibr_data(
+    n_subjects = 10, n_time = 3, alpha = c(-0.2, 0.3), beta = c(0.1, -0.2),
+    sigma_alpha = 0.3, sigma_beta = 0.2, phi = 12,
+    X = matrix(rbinom(30, 1, 0.5)), Z = matrix(rbinom(30, 1, 0.5)), seed = 3
+  )
+  fit <- fit_zibr(
+    y = dat$Y, id = dat$Subject, X = dat$X.1, Z = dat$Z.1,
+    phi_start = 10, alpha_start = c(-0.1, 0.1), beta_start = c(0.1, 0.1),
+    n_iter = 10, seed = 3, compute_fim = FALSE
+  )
+  fit$data <- NULL  # simula un ajuste viejo, sin datos guardados
+  grDevices::pdf(NULL)
+  on.exit(grDevices::dev.off())
+  expect_error(plot(fit, which = "ajuste"), "no guardo los datos")
 })
 
 test_that("vcov.zibr_saem exige haber ajustado con compute_fim = TRUE", {
