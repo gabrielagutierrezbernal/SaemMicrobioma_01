@@ -20,7 +20,8 @@ fit_zibr(
   beta_random = NULL,
   n_is = 500,
   compute_fim = TRUE,
-  eps = 1e-06
+  eps = 1e-06,
+  cov_random = c("diag", "unstructured")
 )
 }
 \arguments{
@@ -68,6 +69,11 @@ Fisher estocastica (necesaria para \code{vcov()}/\code{se()}).}
 
 \item{eps}{Valor pequeno usado para evitar \code{log(0)} cuando \code{y} contiene
 valores exactamente 0 (con \code{zi = FALSE}) o exactamente 1.}
+\item{cov_random}{Estructura de la covarianza de los efectos aleatorios:
+\code{"diag"} (por defecto, independientes entre las dos partes del modelo) o
+\code{"unstructured"} (estima tambien la covarianza). Ver \code{\link[=fit_zibbmr]{fit_zibbmr()}} para
+las advertencias sobre \code{"unstructured"}.}
+
 }
 \value{
 Un objeto de clase \code{zibr_saem} (y \code{SAEM_ZIBR_result} por

@@ -20,7 +20,8 @@ fit_zibbmr(
   alpha_random = NULL,
   beta_random = NULL,
   n_is = 500,
-  compute_fim = TRUE
+  compute_fim = TRUE,
+  cov_random = c("diag", "unstructured")
 )
 }
 \arguments{
@@ -65,6 +66,25 @@ log-verosimilitud marginal.}
 
 \item{compute_fim}{Logico. Si \code{TRUE}, calcula la matriz de informacion de
 Fisher estocastica (necesaria para \code{vcov()}/\code{se()}).}
+\item{cov_random}{Estructura de la matriz de covarianza de los efectos
+aleatorios. \code{"diag"} (por defecto) los trata como independientes entre la
+parte de inflacion de ceros y la parte beta-binomial: es la especificacion
+del articulo y la unica que las alternativas (\code{glmmTMB}, \code{gamlss})
+tambien pueden ajustar. \code{"unstructured"} estima ademas la covarianza
+entre ambos.
+
+Conviene usar \code{"unstructured"} solo con bastante informacion: con pocos
+sujetos u observaciones por sujeto la matriz sin restricciones degenera
+(la correlacion se va a \eqn{\pm 1} y una de las varianzas colapsa). Como
+referencia, con 40 sujetos y 4 observaciones cada uno se ha observado
+\eqn{\hat\rho = -0.92} sobre datos generados con \eqn{\rho = 0}.
+
+Ojo: la matriz de informacion de Fisher esta derivada para el caso
+diagonal, asi que con \code{"unstructured"} los errores estandar son
+aproximados y no hay error estandar para la correlacion. Para contrastar
+\eqn{H_0:\rho=0} conviene usar el test de razon de verosimilitud sobre
+\code{logLik()} en vez de un test de Wald.}
+
 }
 \value{
 Un objeto de clase \code{zibbmr_saem} (y \code{SAEM_ZIBBMR_result} por

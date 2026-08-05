@@ -61,7 +61,11 @@
   }
 
   G_inv <- .saem_diag_inverse(G)
-  G_det <- prod(diag(G))
+  # prod(diag(G)) es el determinante solo si G es diagonal. Como el paso M
+  # estima la matriz completa, hay que usar det(): de lo contrario la densidad
+  # normal de los efectos aleatorios queda mal normalizada y la verosimilitud
+  # marginal (y con ella el LRT) sale sesgada cuando la covarianza no es cero.
+  G_det <- det(as.matrix(G))
 
   psi_array <- array(rep(psi_mean, n_samples), dim = c(dim(psi_mean), n_samples))
   sd_array <- array(rep(sqrt(psi_var), n_samples), dim = dim(psi_array))
@@ -342,6 +346,23 @@
 #'   log-verosimilitud marginal.
 #' @param compute_fim Logico. Si `TRUE`, calcula la matriz de informacion de
 #'   Fisher estocastica (necesaria para `vcov()`/`se()`).
+#' @param cov_random Estructura de la matriz de covarianza de los efectos
+#'   aleatorios. `"diag"` (por defecto) los trata como independientes entre la
+#'   parte de inflacion de ceros y la parte beta-binomial: es la especificacion
+#'   del articulo y la unica que las alternativas (`glmmTMB`, `gamlss`) tambien
+#'   pueden ajustar. `"unstructured"` estima ademas la covarianza entre ambos.
+#'
+#'   Conviene usar `"unstructured"` solo con bastante informacion: con pocos
+#'   sujetos u observaciones por sujeto la matriz sin restricciones degenera
+#'   (la correlacion se va a \eqn{\pm 1} y una de las varianzas colapsa). Como
+#'   referencia, con 40 sujetos y 4 observaciones cada uno se ha observado
+#'   \eqn{\hat\rho = -0.92} sobre datos generados con \eqn{\rho = 0}.
+#'
+#'   Ojo: la matriz de informacion de Fisher esta derivada para el caso
+#'   diagonal, asi que con `"unstructured"` los errores estandar son
+#'   aproximados y no hay error estandar para la correlacion. Para contrastar
+#'   \eqn{H_0:\rho=0} conviene usar el test de razon de verosimilitud sobre
+#'   `logLik()` en vez de un test de Wald.
 #'
 #' @return Un objeto de clase `zibbmr_saem` (y `SAEM_ZIBBMR_result` por
 #'   compatibilidad), con los mismos elementos que [fit_zibr()] (`mu`, `G`,
@@ -377,8 +398,10 @@ fit_zibbmr <- function(y, S, id, X = NULL, Z = NULL, zi = TRUE,
                        phi_start, alpha_start = NULL, beta_start,
                        n_iter = 1000, n_chains = 5, seed = NULL,
                        alpha_random = NULL, beta_random = NULL,
-                       n_is = 500, compute_fim = TRUE) {
+                       n_is = 500, compute_fim = TRUE,
+                       cov_random = c("diag", "unstructured")) {
   .saem_check_packages(inference = compute_fim)
+  cov_random <- .saem_valida_estructura(cov_random)
 
   if (!is.null(seed)) {
     set.seed(seed)
@@ -469,7 +492,7 @@ fit_zibbmr <- function(y, S, id, X = NULL, Z = NULL, zi = TRUE,
 
   mu <- c(alpha_start, beta_start)
   G_full <- 0.5 * .saem_diag(abs(mu))
-  G <- as.matrix(G_full[random_index, random_index, drop = FALSE])
+  G <- .saem_impone_estructura(G_full[random_index, random_index, drop = FALSE], cov_random)
   phi <- phi_start
 
   psi_chain <- matrix(
@@ -734,7 +757,10 @@ fit_zibbmr <- function(y, S, id, X = NULL, Z = NULL, zi = TRUE,
     if (iter > 10) {
       mu <- stat1 / n_subjects
       G_full <- stat2 / n_subjects - (stat1 %*% t(stat1)) / n_subjects^2
-      G <- as.matrix(G_full[random_index, random_index, drop = FALSE])
+      G <- .saem_impone_estructura(G_full[random_index, random_index, drop = FALSE], cov_random)
+      # El kernel de propuesta usa G_full, asi que tiene que respetar la misma
+      # restriccion; si no, propone en direcciones que el modelo no admite.
+      G_full[random_index, random_index] <- G
 
       beta <- mu[n_alpha + seq_len(n_beta)]
 
@@ -889,6 +915,7 @@ fit_zibbmr <- function(y, S, id, X = NULL, Z = NULL, zi = TRUE,
   out <- list(
     mu = mu,
     G = G,
+    cov_random = cov_random,
     phi = phi,
     psi_mean = psi_mean,
     psi_var = psi_var,

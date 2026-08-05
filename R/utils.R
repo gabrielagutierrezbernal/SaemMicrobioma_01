@@ -29,8 +29,67 @@
   }
 }
 
+# Inversa de la matriz de covarianza de los efectos aleatorios.
+#
+# La version anterior calculaba diag(1 / diag(G)), es decir invertia G
+# descartando los terminos fuera de la diagonal. Con G diagonal el resultado es
+# el mismo, pero el paso M del SAEM estima la matriz COMPLETA (ver el calculo de
+# `G_full` en zibbmr.R y zibr.R), de modo que en cuanto los efectos aleatorios
+# de las dos partes del modelo estan correlacionados la precision quedaba mal.
+#
+# Esto afectaba la razon de aceptacion de Metropolis-Hastings, que evaluaba la
+# densidad previa como si los efectos aleatorios fueran independientes: las
+# trazas salian sin correlacion, la covarianza acumulada no crecia y G volvia a
+# ser casi diagonal en la iteracion siguiente. Resultado: un punto fijo
+# autoreforzado con rho ~ 0 (con rho verdadero 0.7 se estimaba ~0.09). Tambien
+# afectaba la verosimilitud marginal por importance sampling, y con ella el LRT.
 .saem_diag_inverse <- function(G) {
-  .saem_diag(.saem_diag(G)^-1)
+  G <- as.matrix(G)
+
+  inversa <- try(solve(G), silent = TRUE)
+
+  # Si G es singular o esta mal condicionada (puede pasar en iteraciones
+  # tempranas del SAEM, antes de que las componentes de varianza se estabilicen)
+  # se recurre a la pseudo-inversa en vez de fallar.
+  if (inherits(inversa, "try-error")) {
+    descomposicion <- eigen(G, symmetric = TRUE)
+    positivos <- descomposicion$values >
+      max(1e-10, max(descomposicion$values) * 1e-10)
+
+    if (!any(positivos)) {
+      stop("La matriz de covarianza de los efectos aleatorios es singular.",
+           call. = FALSE)
+    }
+
+    inversa <- descomposicion$vectors[, positivos, drop = FALSE] %*%
+      diag(1 / descomposicion$values[positivos],
+           nrow = sum(positivos)) %*%
+      t(descomposicion$vectors[, positivos, drop = FALSE])
+  }
+
+  inversa
+}
+
+# Impone la estructura pedida a la covarianza de los efectos aleatorios.
+#
+# "diag"          efectos aleatorios independientes entre las dos partes del
+#                 modelo. Es la especificacion del articulo y el valor por
+#                 defecto: con pocos sujetos u observaciones por sujeto, la
+#                 matriz sin restricciones degenera (rho -> +-1 y colapso de una
+#                 de las varianzas).
+# "unstructured"  covarianza libre. Habilita estimar la correlacion entre el
+#                 efecto aleatorio de la parte de inflacion de ceros y el de la
+#                 parte de abundancia, que ni glmmTMB ni gamlss pueden
+#                 representar. Requiere bastante mas informacion.
+.saem_impone_estructura <- function(G, estructura) {
+  if (identical(estructura, "diag")) {
+    return(.saem_diag(diag(as.matrix(G))))
+  }
+  as.matrix(G)
+}
+
+.saem_valida_estructura <- function(estructura) {
+  match.arg(estructura, c("diag", "unstructured"))
 }
 
 .saem_covariate_matrix <- function(x, n, prefix) {

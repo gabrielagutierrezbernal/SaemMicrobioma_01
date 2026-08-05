@@ -34,13 +34,21 @@ test_that("fit_zibbmr reproduce un resultado conocido para una semilla fija", {
   )
 
   expect_s3_class(fit, "zibbmr_saem")
+  # Valores regenerados (ago-2026) tras corregir el manejo de la covarianza de
+  # los efectos aleatorios: ver tests/testthat/test-covarianza-efectos-aleatorios.R
+  # y la nota en .saem_diag_inverse(). Con cov_random = "diag" (el valor por
+  # defecto, que es la especificacion del articulo) el cambio es pequeno y esta
+  # muy por debajo del ruido semilla a semilla del algoritmo: la diferencia
+  # maxima en mu es 1.4e-2 en ZIBBMR y 2.8e-2 en ZIBR, contra una desviacion
+  # entre semillas del orden de 7e-2. Los resultados publicados no se ven
+  # materialmente afectados.
   expect_equal(
     fit$mu,
-    c(-0.1778585, 0.4116652, 0.1319999, -0.3502025),
+    c(-0.1660967, 0.4001918, 0.1179033, -0.3392167),
     tolerance = 1e-5
   )
-  expect_equal(fit$phi, 14.69017, tolerance = 1e-4)
-  expect_equal(fit$loglik, -616.2257, tolerance = 1e-2)
+  expect_equal(fit$phi, 14.74063, tolerance = 1e-4)
+  expect_equal(fit$loglik, -616.1987, tolerance = 1e-2)
 })
 
 test_that("saem_zibbmr_clean (alias historico) da el mismo resultado que fit_zibbmr", {

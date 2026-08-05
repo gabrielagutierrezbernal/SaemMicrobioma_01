@@ -80,7 +80,9 @@
   }
 
   G_inv <- .saem_diag_inverse(G)
-  G_det <- prod(diag(G))
+  # Ver la nota en zibbmr.R: prod(diag(G)) solo es el determinante si G es
+  # diagonal, y el paso M estima la matriz completa.
+  G_det <- det(as.matrix(G))
 
   psi_array <- array(rep(psi_mean, n_samples), dim = c(dim(psi_mean), n_samples))
   sd_array <- array(rep(sqrt(psi_var), n_samples), dim = dim(psi_array))
@@ -351,6 +353,10 @@
 #'   beta son efectos aleatorios (por defecto, solo el intercepto).
 #' @param n_is Numero de muestras de importance sampling usadas para estimar
 #'   la log-verosimilitud marginal al final del ajuste.
+#' @param cov_random Estructura de la covarianza de los efectos aleatorios:
+#'   `"diag"` (por defecto, independientes entre las dos partes del modelo) o
+#'   `"unstructured"` (estima tambien la covarianza). Ver [fit_zibbmr()] para
+#'   las advertencias sobre `"unstructured"`.
 #' @param compute_fim Logico. Si `TRUE`, calcula la matriz de informacion de
 #'   Fisher estocastica (necesaria para `vcov()`/`se()`).
 #' @param eps Valor pequeno usado para evitar `log(0)` cuando `y` contiene
@@ -389,8 +395,10 @@ fit_zibr <- function(y, id, X = NULL, Z = NULL, zi = TRUE,
                      phi_start, alpha_start = NULL, beta_start,
                      n_iter = 500, n_chains = 5, seed = NULL,
                      alpha_random = NULL, beta_random = NULL,
-                     n_is = 500, compute_fim = TRUE, eps = 1e-6) {
+                     n_is = 500, compute_fim = TRUE, eps = 1e-6,
+                     cov_random = c("diag", "unstructured")) {
   .saem_check_packages(inference = compute_fim)
+  cov_random <- .saem_valida_estructura(cov_random)
 
   if (!is.null(seed)) {
     set.seed(seed)
@@ -474,7 +482,7 @@ fit_zibr <- function(y, id, X = NULL, Z = NULL, zi = TRUE,
 
   mu <- c(alpha_start, beta_start)
   G_full <- 0.5 * .saem_diag(abs(mu))
-  G <- as.matrix(G_full[random_index, random_index, drop = FALSE])
+  G <- .saem_impone_estructura(G_full[random_index, random_index, drop = FALSE], cov_random)
   phi <- phi_start
 
   psi_chain <- matrix(
@@ -528,7 +536,7 @@ fit_zibr <- function(y, id, X = NULL, Z = NULL, zi = TRUE,
       byrow = TRUE
     )
 
-    G_inv <- .saem_diag(diag(G)^-1)
+    G_inv <- .saem_diag_inverse(G)
     log_ratio_data <- rep(0, n_chains * n_total)
 
     for (mh_iter in seq_len(4)) {
@@ -729,7 +737,10 @@ fit_zibr <- function(y, id, X = NULL, Z = NULL, zi = TRUE,
     if (iter > 10) {
       mu <- stat1 / n_subjects
       G_full <- stat2 / n_subjects - (stat1 %*% t(stat1)) / n_subjects^2
-      G <- as.matrix(G_full[random_index, random_index, drop = FALSE])
+      G <- .saem_impone_estructura(G_full[random_index, random_index, drop = FALSE], cov_random)
+      # El kernel de propuesta usa G_full: tiene que respetar la misma
+      # restriccion, si no propone en direcciones que el modelo no admite.
+      G_full[random_index, random_index] <- G
 
       beta <- mu[n_alpha + seq_len(n_beta)]
 
@@ -881,6 +892,7 @@ fit_zibr <- function(y, id, X = NULL, Z = NULL, zi = TRUE,
   out <- list(
     mu = mu,
     G = G,
+    cov_random = cov_random,
     phi = phi,
     psi_mean = psi_mean,
     psi_var = psi_var,
