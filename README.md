@@ -67,21 +67,21 @@ print(fit)
 #> ===== Resultados SAEM-ZIBR =====
 #> == Parte logistica: p_it ==
 #>             Estimate   Type
-#> Intercept -0.3413894 Random
-#> X.1        0.5217126  Fixed
+#> Intercept -0.3452480 Random
+#> X.1        0.5332735  Fixed
 #> == Parte beta: u_it ==
 #>             Estimate   Type
-#> Intercept  0.2590285 Random
-#> Z.1       -0.4905294  Fixed
+#> Intercept  0.2656632 Random
+#> Z.1       -0.5009376  Fixed
 #> === Varianzas de efectos aleatorios ===
 #> == Parte logistica ==
 #>            Variance  sqrt.Var
-#> Intercept 0.1890106 0.4347535
+#> Intercept 0.1999159 0.4471195
 #> == Parte beta ==
-#>           Variance  sqrt.Var
-#> Intercept 0.104375 0.3230712
-#> === Phi: 15.68347
-#> === Log-verosimilitud marginal (importance sampling): -493.894
+#>            Variance  sqrt.Var
+#> Intercept 0.1034754 0.3216759
+#> === Phi: 15.63579
+#> === Log-verosimilitud marginal (importance sampling): -493.249
 ```
 
 ## Ejemplo: ZIBBMR (conteos con profundidad de secuenciacion)
@@ -117,21 +117,21 @@ print(fit_counts)
 #> ===== Resultados SAEM-ZIBBMR =====
 #> == Parte logistica: p_it ==
 #>             Estimate   Type
-#> Intercept -0.3288702 Random
-#> X.1        0.5551507  Fixed
+#> Intercept -0.3165230 Random
+#> X.1        0.5434143  Fixed
 #> == Parte beta-binomial: u_it ==
-#>             Estimate   Type
-#> Intercept  0.2250545 Random
-#> Z.1       -0.4403415  Fixed
+#>            Estimate   Type
+#> Intercept  0.227703 Random
+#> Z.1       -0.444607  Fixed
 #> === Varianzas de efectos aleatorios ===
 #> == Parte logistica ==
 #>            Variance  sqrt.Var
-#> Intercept 0.1743002 0.4174927
+#> Intercept 0.1338111 0.3658019
 #> == Parte beta-binomial ==
 #>            Variance  sqrt.Var
-#> Intercept 0.1301591 0.3607756
-#> === Phi: 17.06811
-#> === Log-verosimilitud marginal (importance sampling): -4542.346
+#> Intercept 0.1277649 0.3574422
+#> === Phi: 16.97994
+#> === Log-verosimilitud marginal (importance sampling): -4542.437
 ```
 
 ## Ajuste por taxon y comparación de modelos anidados
@@ -149,8 +149,8 @@ reduced <- fit_zibr_taxon(
 )
 
 lrt_zibr(full, reduced, df = 1)
-#>    LL_full LL_reduced      LRT df    p_value
-#> 1 14.64046   12.90933 3.462264  1 0.06278431
+#>    LL_full LL_reduced      LRT df   p_value
+#> 1 14.80238   13.75381 2.097151  1 0.1475739
 ```
 
 ## Más información
