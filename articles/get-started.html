@@ -228,21 +228,21 @@ proporcion ya dividida:</p>
 <span><span class="co">#&gt; ===== Resultados SAEM-ZIBBMR =====</span></span>
 <span><span class="co">#&gt; == Parte logistica: p_it ==</span></span>
 <span><span class="co">#&gt;             Estimate   Type</span></span>
-<span><span class="co">#&gt; Intercept -0.3119111 Random</span></span>
-<span><span class="co">#&gt; X.1        0.5357955  Fixed</span></span>
+<span><span class="co">#&gt; Intercept -0.3089112 Random</span></span>
+<span><span class="co">#&gt; X.1        0.5328838  Fixed</span></span>
 <span><span class="co">#&gt; == Parte beta-binomial: u_it ==</span></span>
 <span><span class="co">#&gt;             Estimate   Type</span></span>
-<span><span class="co">#&gt; Intercept  0.2275699 Random</span></span>
-<span><span class="co">#&gt; Z.1       -0.4448816  Fixed</span></span>
+<span><span class="co">#&gt; Intercept  0.2269500 Random</span></span>
+<span><span class="co">#&gt; Z.1       -0.4436195  Fixed</span></span>
 <span><span class="co">#&gt; === Varianzas de efectos aleatorios ===</span></span>
 <span><span class="co">#&gt; == Parte logistica ==</span></span>
 <span><span class="co">#&gt;            Variance  sqrt.Var</span></span>
-<span><span class="co">#&gt; Intercept 0.1393422 0.3732857</span></span>
+<span><span class="co">#&gt; Intercept 0.1406562 0.3750416</span></span>
 <span><span class="co">#&gt; == Parte beta-binomial ==</span></span>
-<span><span class="co">#&gt;           Variance  sqrt.Var</span></span>
-<span><span class="co">#&gt; Intercept  0.12712 0.3565389</span></span>
-<span><span class="co">#&gt; === Phi: 16.96089</span></span>
-<span><span class="co">#&gt; === Log-verosimilitud marginal (importance sampling): -4542.404</span></span></code></pre></div>
+<span><span class="co">#&gt;            Variance  sqrt.Var</span></span>
+<span><span class="co">#&gt; Intercept 0.1272175 0.3566757</span></span>
+<span><span class="co">#&gt; === Phi: 16.95947</span></span>
+<span><span class="co">#&gt; === Log-verosimilitud marginal (importance sampling): -4542.401</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="ajustar-varios-taxones-de-un-data-frame">Ajustar varios taxones de un data frame<a class="anchor" aria-label="anchor" href="#ajustar-varios-taxones-de-un-data-frame"></a>
@@ -273,8 +273,8 @@ vez:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">fits</span>, <span class="va">coef</span><span class="op">)</span></span>
 <span><span class="co">#&gt;           Taxon1      Taxon2      Taxon3</span></span>
 <span><span class="co">#&gt; [1,]  0.03316703  0.04600185  0.01918726</span></span>
-<span><span class="co">#&gt; [2,] 21.50281110 19.63051394 21.02800654</span></span>
-<span><span class="co">#&gt; [3,]  3.16183458  3.64183411  3.13010315</span></span>
+<span><span class="co">#&gt; [2,] 20.24933154 19.63051394 21.02800654</span></span>
+<span><span class="co">#&gt; [3,]  3.06102731  3.64183411  3.13010315</span></span>
 <span><span class="co">#&gt; [4,] -0.66417203 -0.36076842 -0.35737318</span></span>
 <span><span class="co">#&gt; [5,]  0.02691860 -0.08827703 -0.16962942</span></span>
 <span><span class="co">#&gt; [6,]  0.03007764 -0.19253735  0.07614628</span></span></code></pre></div>
@@ -322,8 +322,8 @@ por nombre de columna:</p>
 <span><span class="co">#&gt; == Parte logistica: p_it ==</span></span>
 <span><span class="co">#&gt;              Estimate   Type</span></span>
 <span><span class="co">#&gt; Intercept  0.03316703 Random</span></span>
-<span><span class="co">#&gt; tiempo    21.50281110  Fixed</span></span>
-<span><span class="co">#&gt; grupo      3.16183458  Fixed</span></span>
+<span><span class="co">#&gt; tiempo    20.24933154  Fixed</span></span>
+<span><span class="co">#&gt; grupo      3.06102731  Fixed</span></span>
 <span><span class="co">#&gt; == Parte beta: u_it ==</span></span>
 <span><span class="co">#&gt;              Estimate   Type</span></span>
 <span><span class="co">#&gt; Intercept -0.66417203 Random</span></span>

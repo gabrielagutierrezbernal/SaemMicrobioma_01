@@ -189,21 +189,21 @@ fit_counts
 #> ===== Resultados SAEM-ZIBBMR =====
 #> == Parte logistica: p_it ==
 #>             Estimate   Type
-#> Intercept -0.3119111 Random
-#> X.1        0.5357955  Fixed
+#> Intercept -0.3089112 Random
+#> X.1        0.5328838  Fixed
 #> == Parte beta-binomial: u_it ==
 #>             Estimate   Type
-#> Intercept  0.2275699 Random
-#> Z.1       -0.4448816  Fixed
+#> Intercept  0.2269500 Random
+#> Z.1       -0.4436195  Fixed
 #> === Varianzas de efectos aleatorios ===
 #> == Parte logistica ==
 #>            Variance  sqrt.Var
-#> Intercept 0.1393422 0.3732857
+#> Intercept 0.1406562 0.3750416
 #> == Parte beta-binomial ==
-#>           Variance  sqrt.Var
-#> Intercept  0.12712 0.3565389
-#> === Phi: 16.96089
-#> === Log-verosimilitud marginal (importance sampling): -4542.404
+#>            Variance  sqrt.Var
+#> Intercept 0.1272175 0.3566757
+#> === Phi: 16.95947
+#> === Log-verosimilitud marginal (importance sampling): -4542.401
 ```
 
 ## Ajustar varios taxones de un data frame
@@ -236,8 +236,8 @@ fits <- fit_zibr_taxa(
 sapply(fits, coef)
 #>           Taxon1      Taxon2      Taxon3
 #> [1,]  0.03316703  0.04600185  0.01918726
-#> [2,] 21.50281110 19.63051394 21.02800654
-#> [3,]  3.16183458  3.64183411  3.13010315
+#> [2,] 20.24933154 19.63051394 21.02800654
+#> [3,]  3.06102731  3.64183411  3.13010315
 #> [4,] -0.66417203 -0.36076842 -0.35737318
 #> [5,]  0.02691860 -0.08827703 -0.16962942
 #> [6,]  0.03007764 -0.19253735  0.07614628
@@ -292,8 +292,8 @@ fit_saem_microbiome(
 #> == Parte logistica: p_it ==
 #>              Estimate   Type
 #> Intercept  0.03316703 Random
-#> tiempo    21.50281110  Fixed
-#> grupo      3.16183458  Fixed
+#> tiempo    20.24933154  Fixed
+#> grupo      3.06102731  Fixed
 #> == Parte beta: u_it ==
 #>              Estimate   Type
 #> Intercept -0.66417203 Random
