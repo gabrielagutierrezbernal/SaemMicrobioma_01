@@ -112,21 +112,21 @@
 <span><span class="co">#&gt; ===== Resultados SAEM-ZIBR =====</span></span>
 <span><span class="co">#&gt; == Parte logistica: p_it ==</span></span>
 <span><span class="co">#&gt;             Estimate   Type</span></span>
-<span><span class="co">#&gt; Intercept -0.3413894 Random</span></span>
-<span><span class="co">#&gt; X.1        0.5217126  Fixed</span></span>
+<span><span class="co">#&gt; Intercept -0.3452480 Random</span></span>
+<span><span class="co">#&gt; X.1        0.5332735  Fixed</span></span>
 <span><span class="co">#&gt; == Parte beta: u_it ==</span></span>
 <span><span class="co">#&gt;             Estimate   Type</span></span>
-<span><span class="co">#&gt; Intercept  0.2590285 Random</span></span>
-<span><span class="co">#&gt; Z.1       -0.4905294  Fixed</span></span>
+<span><span class="co">#&gt; Intercept  0.2656632 Random</span></span>
+<span><span class="co">#&gt; Z.1       -0.5009376  Fixed</span></span>
 <span><span class="co">#&gt; === Varianzas de efectos aleatorios ===</span></span>
 <span><span class="co">#&gt; == Parte logistica ==</span></span>
 <span><span class="co">#&gt;            Variance  sqrt.Var</span></span>
-<span><span class="co">#&gt; Intercept 0.1890106 0.4347535</span></span>
+<span><span class="co">#&gt; Intercept 0.1999159 0.4471195</span></span>
 <span><span class="co">#&gt; == Parte beta ==</span></span>
-<span><span class="co">#&gt;           Variance  sqrt.Var</span></span>
-<span><span class="co">#&gt; Intercept 0.104375 0.3230712</span></span>
-<span><span class="co">#&gt; === Phi: 15.68347</span></span>
-<span><span class="co">#&gt; === Log-verosimilitud marginal (importance sampling): -493.894</span></span></code></pre></div>
+<span><span class="co">#&gt;            Variance  sqrt.Var</span></span>
+<span><span class="co">#&gt; Intercept 0.1034754 0.3216759</span></span>
+<span><span class="co">#&gt; === Phi: 15.63579</span></span>
+<span><span class="co">#&gt; === Log-verosimilitud marginal (importance sampling): -493.249</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="ejemplo-zibbmr-conteos-con-profundidad-de-secuenciacion">Ejemplo: ZIBBMR (conteos con profundidad de secuenciacion)<a class="anchor" aria-label="anchor" href="#ejemplo-zibbmr-conteos-con-profundidad-de-secuenciacion"></a>
@@ -157,21 +157,21 @@
 <span><span class="co">#&gt; ===== Resultados SAEM-ZIBBMR =====</span></span>
 <span><span class="co">#&gt; == Parte logistica: p_it ==</span></span>
 <span><span class="co">#&gt;             Estimate   Type</span></span>
-<span><span class="co">#&gt; Intercept -0.3288702 Random</span></span>
-<span><span class="co">#&gt; X.1        0.5551507  Fixed</span></span>
+<span><span class="co">#&gt; Intercept -0.3165230 Random</span></span>
+<span><span class="co">#&gt; X.1        0.5434143  Fixed</span></span>
 <span><span class="co">#&gt; == Parte beta-binomial: u_it ==</span></span>
-<span><span class="co">#&gt;             Estimate   Type</span></span>
-<span><span class="co">#&gt; Intercept  0.2250545 Random</span></span>
-<span><span class="co">#&gt; Z.1       -0.4403415  Fixed</span></span>
+<span><span class="co">#&gt;            Estimate   Type</span></span>
+<span><span class="co">#&gt; Intercept  0.227703 Random</span></span>
+<span><span class="co">#&gt; Z.1       -0.444607  Fixed</span></span>
 <span><span class="co">#&gt; === Varianzas de efectos aleatorios ===</span></span>
 <span><span class="co">#&gt; == Parte logistica ==</span></span>
 <span><span class="co">#&gt;            Variance  sqrt.Var</span></span>
-<span><span class="co">#&gt; Intercept 0.1743002 0.4174927</span></span>
+<span><span class="co">#&gt; Intercept 0.1338111 0.3658019</span></span>
 <span><span class="co">#&gt; == Parte beta-binomial ==</span></span>
 <span><span class="co">#&gt;            Variance  sqrt.Var</span></span>
-<span><span class="co">#&gt; Intercept 0.1301591 0.3607756</span></span>
-<span><span class="co">#&gt; === Phi: 17.06811</span></span>
-<span><span class="co">#&gt; === Log-verosimilitud marginal (importance sampling): -4542.346</span></span></code></pre></div>
+<span><span class="co">#&gt; Intercept 0.1277649 0.3574422</span></span>
+<span><span class="co">#&gt; === Phi: 16.97994</span></span>
+<span><span class="co">#&gt; === Log-verosimilitud marginal (importance sampling): -4542.437</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="ajuste-por-taxon-y-comparación-de-modelos-anidados">Ajuste por taxon y comparación de modelos anidados<a class="anchor" aria-label="anchor" href="#ajuste-por-taxon-y-comparaci%C3%B3n-de-modelos-anidados"></a>
@@ -189,8 +189,8 @@
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="reference/lrt_zibr.html">lrt_zibr</a></span><span class="op">(</span><span class="va">full</span>, <span class="va">reduced</span>, df <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="co">#&gt;    LL_full LL_reduced      LRT df    p_value</span></span>
-<span><span class="co">#&gt; 1 14.64046   12.90933 3.462264  1 0.06278431</span></span></code></pre></div>
+<span><span class="co">#&gt;    LL_full LL_reduced      LRT df   p_value</span></span>
+<span><span class="co">#&gt; 1 14.80238   13.75381 2.097151  1 0.1475739</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="más-información">Más información<a class="anchor" aria-label="anchor" href="#m%C3%A1s-informaci%C3%B3n"></a>

@@ -2,6 +2,24 @@
 
 ## saemMicrobiome 0.0.1
 
+- Covarianza de los efectos aleatorios (parche de Cristian Meza,
+  ago-2026): el paso M del SAEM estima la matriz de covarianza completa,
+  pero tres puntos del codigo la trataban como diagonal (la inversa
+  `.saem_diag_inverse()`, el determinante en la verosimilitud por
+  importance sampling, y la matriz del kernel de propuesta), lo que
+  impedia estimar la correlacion entre los efectos aleatorios de las dos
+  partes del modelo (quedaba atrapada cerca de cero). Se corrige y se
+  agrega el argumento `cov_random` a
+  [`fit_zibr()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/fit_zibr.md)/[`fit_zibbmr()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/fit_zibbmr.md):
+  `"diag"` (por defecto, efectos independientes, la especificacion del
+  articulo) o `"unstructured"` (estima ademas la covarianza). Con
+  `"diag"` los resultados no cambian materialmente (la diferencia esta
+  muy por debajo del ruido semilla a semilla). Nota: la matriz de
+  informacion de Fisher esta derivada para el caso diagonal, asi que con
+  `"unstructured"` los errores estandar son aproximados; para contrastar
+  la correlacion conviene un test de razon de verosimilitud. No es un
+  problema introducido por la reimplementacion: el codigo original de
+  John tenia lo mismo.
 - Ejemplos del README: se aumento el tamano de muestra a 300 sujetos (y
   300 iteraciones) para que los estimados de los ejemplos ZIBR y ZIBBMR
   queden cerca de los valores verdaderos de la simulacion (antes, con 30

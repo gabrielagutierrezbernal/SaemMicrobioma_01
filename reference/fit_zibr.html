@@ -80,7 +80,8 @@ tiene dos partes: una logistica para la probabilidad de presencia
 <span>  beta_random <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  n_is <span class="op">=</span> <span class="fl">500</span>,</span>
 <span>  compute_fim <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  eps <span class="op">=</span> <span class="fl">1e-06</span></span>
+<span>  eps <span class="op">=</span> <span class="fl">1e-06</span>,</span>
+<span>  cov_random <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"diag"</span>, <span class="st">"unstructured"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -164,6 +165,13 @@ Fisher estocastica (necesaria para <code><a href="https://rdrr.io/r/stats/vcov.h
 <dd><p>Valor pequeno usado para evitar <code>log(0)</code> cuando <code>y</code> contiene
 valores exactamente 0 (con <code>zi = FALSE</code>) o exactamente 1.</p></dd>
 
+<dt id="arg-cov-random">cov_random<a class="anchor" aria-label="anchor" href="#arg-cov-random"></a></dt>
+<dd><p>Estructura de la covarianza de los efectos aleatorios:
+<code>"diag"</code> (por defecto, independientes entre las dos partes del modelo) o
+<code>"unstructured"</code> (estima tambien la covarianza). Ver <code><a href="fit_zibbmr.html">fit_zibbmr()</a></code> para
+las advertencias sobre <code>"unstructured"</code>.</p></dd>
+
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -201,21 +209,21 @@ un data frame, <code><a href="simulate_zibr_data.html">simulate_zibr_data()</a><
 <span class="r-out co"><span class="r-pr">#&gt;</span> ===== Resultados SAEM-ZIBR =====</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> == Parte logistica: p_it ==</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate   Type</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept -0.6427290 Random</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> X.1        0.8896106  Fixed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept -0.5671386 Random</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> X.1        0.8180476  Fixed</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> == Parte beta: u_it ==</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             Estimate   Type</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept  0.2046442 Random</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Z.1       -0.3698988  Fixed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept  0.2057251 Random</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Z.1       -0.3737307  Fixed</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> === Varianzas de efectos aleatorios ===</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> == Parte logistica ==</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             Variance  sqrt.Var</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 0.03175983 0.1782129</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>             Variance sqrt.Var</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 0.03400482 0.184404</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> == Parte beta ==</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>             Variance  sqrt.Var</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 0.01772203 0.1331241</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> === Phi: 24.4882</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> === Log-verosimilitud marginal (importance sampling): -22.43429</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Intercept 0.01314309 0.1146433</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> === Phi: 23.70849</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> === Log-verosimilitud marginal (importance sampling): -22.57637</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

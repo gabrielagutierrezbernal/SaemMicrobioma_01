@@ -95,12 +95,26 @@
 </tr><tr><td>Con nucleo en C++</td>
 <td>3.4 s</td>
 </tr></tbody></table></li>
+</ul></div>
+<div class="section level2">
+<h2 id="etapa-5---graficos-y-diagnosticos">Etapa 5 - Graficos y diagnosticos<a class="anchor" aria-label="anchor" href="#etapa-5---graficos-y-diagnosticos"></a></h2>
+<ul><li>
+<strong>Graficos del ajuste</strong> (inspirados en <code>saemix</code>). El metodo <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> de ambos modelos ofrece, via el argumento <code>which</code>, cinco graficos: convergencia del algoritmo, coeficientes con intervalo de confianza, distribucion de los efectos aleatorios por sujeto, observados vs. predichos y residuos (estos dos ultimos sobre la parte continua). El ajuste guarda ademas los datos originales para poder calcularlos. Documentado en <code>estudios/graficos/</code>.</li>
+<li>
+<strong>Ejemplos que estiman cerca de la verdad.</strong> Los ejemplos del README y de la vignette se ajustaron para usar un tamano de muestra suficiente (300 sujetos, 500 iteraciones), de modo que los estimados quedan cerca de los valores verdaderos de la simulacion y <code><a href="reference/se.html">se()</a></code> devuelve errores estandar validos.</li>
+</ul></div>
+<div class="section level2">
+<h2 id="etapa-6---covarianza-de-los-efectos-aleatorios">Etapa 6 - Covarianza de los efectos aleatorios<a class="anchor" aria-label="anchor" href="#etapa-6---covarianza-de-los-efectos-aleatorios"></a></h2>
+<ul><li>
+<strong>Estimacion de la correlacion entre las dos partes del modelo</strong> (parche de Cristian Meza). El paso M del SAEM estima la matriz de covarianza completa, pero tres calculos internos la trataban como diagonal, lo que impedia estimar la correlacion entre el efecto aleatorio de la parte de inflacion de ceros y el de la parte de abundancia. Se corrige y se agrega el argumento <code>cov_random</code> a <code><a href="reference/fit_zibr.html">fit_zibr()</a></code>/<code><a href="reference/fit_zibbmr.html">fit_zibbmr()</a></code>: <code>"diag"</code> (por defecto, la especificacion del articulo) o <code>"unstructured"</code> (estima tambien la covarianza, algo que ni <code>glmmTMB</code> ni <code>gamlss</code> pueden representar). Con <code>"diag"</code> los resultados no cambian materialmente. Es una capacidad relevante para la revision del paper de ZIBBMR.</li>
 </ul><hr></div>
 <div class="section level2">
 <h2 id="estado-actual">Estado actual<a class="anchor" aria-label="anchor" href="#estado-actual"></a></h2>
-<ul><li>Paquete funcional, documentado, con 93 pruebas automaticas que pasan y <code>R CMD check</code> sin errores, warnings ni notas.</li>
-<li>Reproduce exactamente el codigo original de John Barrera.</li>
-<li>Optimizado (~2.3x más rapido que la versión inicial) sin alterar ningún resultado.</li>
+<ul><li>Paquete funcional, documentado, con 118 pruebas automaticas que pasan y <code>R CMD check</code> sin errores, warnings ni notas.</li>
+<li>Reproduce el codigo original de John Barrera.</li>
+<li>Optimizado (~2.3x más rapido que la versión inicial) sin alterar los resultados.</li>
+<li>Cinco graficos de diagnostico/resultado por ajuste, inspirados en <code>saemix</code>.</li>
+<li>Permite estimar la covarianza entre los efectos aleatorios de las dos partes del modelo (<code>cov_random = "unstructured"</code>).</li>
 <li>Publicado en <a href="https://github.com/gabrielagutierrezbernal/SaemMicrobioma_01" class="external-link uri">https://github.com/gabrielagutierrezbernal/SaemMicrobioma_01</a> con sitio de documentación e integración continua activos.</li>
 </ul></div>
 </div>

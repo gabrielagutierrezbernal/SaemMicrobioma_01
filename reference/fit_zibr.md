@@ -29,7 +29,8 @@ fit_zibr(
   beta_random = NULL,
   n_is = 500,
   compute_fim = TRUE,
-  eps = 1e-06
+  eps = 1e-06,
+  cov_random = c("diag", "unstructured")
 )
 ```
 
@@ -112,6 +113,14 @@ fit_zibr(
   Valor pequeno usado para evitar `log(0)` cuando `y` contiene valores
   exactamente 0 (con `zi = FALSE`) o exactamente 1.
 
+- cov_random:
+
+  Estructura de la covarianza de los efectos aleatorios: `"diag"` (por
+  defecto, independientes entre las dos partes del modelo) o
+  `"unstructured"` (estima tambien la covarianza). Ver
+  [`fit_zibbmr()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/fit_zibbmr.md)
+  para las advertencias sobre `"unstructured"`.
+
 ## Value
 
 Un objeto de clase `zibr_saem` (y `SAEM_ZIBR_result` por
@@ -156,20 +165,20 @@ print(fit)
 #> ===== Resultados SAEM-ZIBR =====
 #> == Parte logistica: p_it ==
 #>             Estimate   Type
-#> Intercept -0.6427290 Random
-#> X.1        0.8896106  Fixed
+#> Intercept -0.5671386 Random
+#> X.1        0.8180476  Fixed
 #> == Parte beta: u_it ==
 #>             Estimate   Type
-#> Intercept  0.2046442 Random
-#> Z.1       -0.3698988  Fixed
+#> Intercept  0.2057251 Random
+#> Z.1       -0.3737307  Fixed
 #> === Varianzas de efectos aleatorios ===
 #> == Parte logistica ==
-#>             Variance  sqrt.Var
-#> Intercept 0.03175983 0.1782129
+#>             Variance sqrt.Var
+#> Intercept 0.03400482 0.184404
 #> == Parte beta ==
 #>             Variance  sqrt.Var
-#> Intercept 0.01772203 0.1331241
-#> === Phi: 24.4882
-#> === Log-verosimilitud marginal (importance sampling): -22.43429
+#> Intercept 0.01314309 0.1146433
+#> === Phi: 23.70849
+#> === Log-verosimilitud marginal (importance sampling): -22.57637
 # }
 ```

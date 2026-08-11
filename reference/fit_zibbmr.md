@@ -31,7 +31,8 @@ fit_zibbmr(
   alpha_random = NULL,
   beta_random = NULL,
   n_is = 500,
-  compute_fim = TRUE
+  compute_fim = TRUE,
+  cov_random = c("diag", "unstructured")
 )
 ```
 
@@ -111,6 +112,29 @@ fit_zibbmr(
   estocastica (necesaria para
   [`vcov()`](https://rdrr.io/r/stats/vcov.html)/[`se()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/se.md)).
 
+- cov_random:
+
+  Estructura de la matriz de covarianza de los efectos aleatorios.
+  `"diag"` (por defecto) los trata como independientes entre la parte de
+  inflacion de ceros y la parte beta-binomial: es la especificacion del
+  articulo y la unica que las alternativas (`glmmTMB`, `gamlss`) tambien
+  pueden ajustar. `"unstructured"` estima ademas la covarianza entre
+  ambos.
+
+  Conviene usar `"unstructured"` solo con bastante informacion: con
+  pocos sujetos u observaciones por sujeto la matriz sin restricciones
+  degenera (la correlacion se va a \\\pm 1\\ y una de las varianzas
+  colapsa). Como referencia, con 40 sujetos y 4 observaciones cada uno
+  se ha observado \\\hat\rho = -0.92\\ sobre datos generados con \\\rho
+  = 0\\.
+
+  Ojo: la matriz de informacion de Fisher esta derivada para el caso
+  diagonal, asi que con `"unstructured"` los errores estandar son
+  aproximados y no hay error estandar para la correlacion. Para
+  contrastar \\H_0:\rho=0\\ conviene usar el test de razon de
+  verosimilitud sobre [`logLik()`](https://rdrr.io/r/stats/logLik.html)
+  en vez de un test de Wald.
+
 ## Value
 
 Un objeto de clase `zibbmr_saem` (y `SAEM_ZIBBMR_result` por
@@ -156,20 +180,20 @@ print(fit)
 #> ===== Resultados SAEM-ZIBBMR =====
 #> == Parte logistica: p_it ==
 #>             Estimate   Type
-#> Intercept -0.5747908 Random
-#> X.1        0.5090540  Fixed
+#> Intercept -0.6297402 Random
+#> X.1        0.5664404  Fixed
 #> == Parte beta-binomial: u_it ==
 #>             Estimate   Type
-#> Intercept  0.1447546 Random
-#> Z.1       -0.4826572  Fixed
+#> Intercept  0.1924133 Random
+#> Z.1       -0.5306866  Fixed
 #> === Varianzas de efectos aleatorios ===
 #> == Parte logistica ==
 #>            Variance  sqrt.Var
-#> Intercept 0.0630821 0.2511615
+#> Intercept 0.1045248 0.3233029
 #> == Parte beta-binomial ==
 #>            Variance  sqrt.Var
-#> Intercept 0.1055846 0.3249378
-#> === Phi: 13.58774
-#> === Log-verosimilitud marginal (importance sampling): -272.0834
+#> Intercept 0.1152981 0.3395557
+#> === Phi: 14.03287
+#> === Log-verosimilitud marginal (importance sampling): -272.2303
 # }
 ```

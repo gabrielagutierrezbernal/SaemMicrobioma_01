@@ -75,21 +75,21 @@ fit
 #> ===== Resultados SAEM-ZIBR =====
 #> == Parte logistica: p_it ==
 #>             Estimate   Type
-#> Intercept -0.3491779 Random
-#> X.1        0.5266508  Fixed
+#> Intercept -0.3429584 Random
+#> X.1        0.5316675  Fixed
 #> == Parte beta: u_it ==
 #>             Estimate   Type
-#> Intercept  0.2616168 Random
-#> Z.1       -0.4927260  Fixed
+#> Intercept  0.2661606 Random
+#> Z.1       -0.5018993  Fixed
 #> === Varianzas de efectos aleatorios ===
 #> == Parte logistica ==
 #>            Variance  sqrt.Var
-#> Intercept 0.1990679 0.4461702
+#> Intercept 0.2027588 0.4502875
 #> == Parte beta ==
 #>            Variance  sqrt.Var
-#> Intercept 0.1050135 0.3240579
-#> === Phi: 15.72674
-#> === Log-verosimilitud marginal (importance sampling): -493.9268
+#> Intercept 0.1030256 0.3209761
+#> === Phi: 15.62099
+#> === Log-verosimilitud marginal (importance sampling): -493.2297
 ```
 
 El objeto devuelto tiene metodos estandar de R para modelos ajustados:
@@ -97,11 +97,12 @@ El objeto devuelto tiene metodos estandar de R para modelos ajustados:
 ``` r
 
 coef(fit)
-#> [1] -0.3491779  0.5266508  0.2616168 -0.4927260
+#> [1] -0.3429584  0.5316675  0.2661606 -0.5018993
 logLik(fit)
-#> 'log Lik.' -493.9268 (df=7)
+#> 'log Lik.' -493.2297 (df=7)
 se(fit)
-#> [1] 0.06628286 0.10457177 0.03579351 0.04600874 1.14040691 0.09891814 0.01989323
+#> Warning in sqrt(diag(.saem_vcov(object))): NaNs produced
+#> [1] 0.04059542 0.09235826 0.04067619 0.05104390 1.26278253        NaN 0.02758059
 ```
 
 > **Nota:** con algunos conjuntos de datos, o con pocas iteraciones, la
@@ -188,21 +189,21 @@ fit_counts
 #> ===== Resultados SAEM-ZIBBMR =====
 #> == Parte logistica: p_it ==
 #>             Estimate   Type
-#> Intercept -0.3176600 Random
-#> X.1        0.5393887  Fixed
+#> Intercept -0.3089112 Random
+#> X.1        0.5328838  Fixed
 #> == Parte beta-binomial: u_it ==
 #>             Estimate   Type
-#> Intercept  0.2233562 Random
-#> Z.1       -0.4379817  Fixed
+#> Intercept  0.2269500 Random
+#> Z.1       -0.4436195  Fixed
 #> === Varianzas de efectos aleatorios ===
 #> == Parte logistica ==
 #>            Variance  sqrt.Var
-#> Intercept 0.1718038 0.4144922
+#> Intercept 0.1406562 0.3750416
 #> == Parte beta-binomial ==
 #>            Variance  sqrt.Var
-#> Intercept 0.1284076 0.3583401
-#> === Phi: 17.00548
-#> === Log-verosimilitud marginal (importance sampling): -4542.357
+#> Intercept 0.1272175 0.3566757
+#> === Phi: 16.95947
+#> === Log-verosimilitud marginal (importance sampling): -4542.401
 ```
 
 ## Ajustar varios taxones de un data frame
@@ -233,13 +234,13 @@ fits <- fit_zibr_taxa(
 )
 
 sapply(fits, coef)
-#>           Taxon1      Taxon2     Taxon3
-#> [1,]  0.05587996  0.13111349 -0.0423997
-#> [2,] 21.50281126 19.57832672 21.0280064
-#> [3,]  3.16183458  3.01938273  3.1301032
-#> [4,] -0.63237382 -0.39258341 -0.3906250
-#> [5,]  0.01704677 -0.08132268 -0.1669231
-#> [6,]  0.03324855 -0.18405358  0.0821391
+#>           Taxon1      Taxon2      Taxon3
+#> [1,]  0.03316703  0.04600185  0.01918726
+#> [2,] 20.24933154 19.63051394 21.02800654
+#> [3,]  3.06102731  3.64183411  3.13010315
+#> [4,] -0.66417203 -0.36076842 -0.35737318
+#> [5,]  0.02691860 -0.08827703 -0.16962942
+#> [6,]  0.03007764 -0.19253735  0.07614628
 ```
 
 ## Comparar modelos anidados con una prueba de razon de verosimilitudes
@@ -261,8 +262,8 @@ reduced <- fit_zibr_taxon(
 )
 
 lrt_zibr(full, reduced, df = 1)
-#>    LL_full LL_reduced      LRT df    p_value
-#> 1 14.64046   12.90933 3.462264  1 0.06278431
+#>    LL_full LL_reduced     LRT df  p_value
+#> 1 14.80238   13.75381 2.09715  1 0.147574
 ```
 
 Para muchos taxones a la vez,
@@ -290,23 +291,23 @@ fit_saem_microbiome(
 #> ===== Resultados SAEM-ZIBR =====
 #> == Parte logistica: p_it ==
 #>              Estimate   Type
-#> Intercept  0.05587996 Random
-#> tiempo    21.50281126  Fixed
-#> grupo      3.16183458  Fixed
+#> Intercept  0.03316703 Random
+#> tiempo    20.24933154  Fixed
+#> grupo      3.06102731  Fixed
 #> == Parte beta: u_it ==
 #>              Estimate   Type
-#> Intercept -0.63237382 Random
-#> tiempo     0.01704677  Fixed
-#> grupo      0.03324855  Fixed
+#> Intercept -0.66417203 Random
+#> tiempo     0.02691860  Fixed
+#> grupo      0.03007764  Fixed
 #> === Varianzas de efectos aleatorios ===
 #> == Parte logistica ==
 #>              Variance   sqrt.Var
-#> Intercept 0.003020215 0.05495648
+#> Intercept 0.007866439 0.08869295
 #> == Parte beta ==
-#>              Variance   sqrt.Var
-#> Intercept 0.004971694 0.07051024
-#> === Phi: 3.987447
-#> === Log-verosimilitud marginal (importance sampling): 14.64046
+#>              Variance  sqrt.Var
+#> Intercept 0.005375147 0.0733154
+#> === Phi: 4.018446
+#> === Log-verosimilitud marginal (importance sampling): 14.80238
 ```
 
 ## Datos propios: preparar un dataset tipo Romero

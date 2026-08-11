@@ -89,15 +89,51 @@ comparación que respaldan lo de abajo.
   | Optimizacion en R | 3.4 s  |
   | Con nucleo en C++ | 3.4 s  |
 
+## Etapa 5 - Graficos y diagnosticos
+
+- **Graficos del ajuste** (inspirados en `saemix`). El metodo
+  [`plot()`](https://rdrr.io/r/graphics/plot.default.html) de ambos
+  modelos ofrece, via el argumento `which`, cinco graficos: convergencia
+  del algoritmo, coeficientes con intervalo de confianza, distribucion
+  de los efectos aleatorios por sujeto, observados vs. predichos y
+  residuos (estos dos ultimos sobre la parte continua). El ajuste guarda
+  ademas los datos originales para poder calcularlos. Documentado en
+  `estudios/graficos/`.
+- **Ejemplos que estiman cerca de la verdad.** Los ejemplos del README y
+  de la vignette se ajustaron para usar un tamano de muestra suficiente
+  (300 sujetos, 500 iteraciones), de modo que los estimados quedan cerca
+  de los valores verdaderos de la simulacion y
+  [`se()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/se.md)
+  devuelve errores estandar validos.
+
+## Etapa 6 - Covarianza de los efectos aleatorios
+
+- **Estimacion de la correlacion entre las dos partes del modelo**
+  (parche de Cristian Meza). El paso M del SAEM estima la matriz de
+  covarianza completa, pero tres calculos internos la trataban como
+  diagonal, lo que impedia estimar la correlacion entre el efecto
+  aleatorio de la parte de inflacion de ceros y el de la parte de
+  abundancia. Se corrige y se agrega el argumento `cov_random` a
+  [`fit_zibr()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/fit_zibr.md)/[`fit_zibbmr()`](https://gabrielagutierrezbernal.github.io/SaemMicrobioma_01/reference/fit_zibbmr.md):
+  `"diag"` (por defecto, la especificacion del articulo) o
+  `"unstructured"` (estima tambien la covarianza, algo que ni `glmmTMB`
+  ni `gamlss` pueden representar). Con `"diag"` los resultados no
+  cambian materialmente. Es una capacidad relevante para la revision del
+  paper de ZIBBMR.
+
 ------------------------------------------------------------------------
 
 ## Estado actual
 
-- Paquete funcional, documentado, con 93 pruebas automaticas que pasan y
-  `R CMD check` sin errores, warnings ni notas.
-- Reproduce exactamente el codigo original de John Barrera.
-- Optimizado (~2.3x más rapido que la versión inicial) sin alterar
-  ningún resultado.
+- Paquete funcional, documentado, con 118 pruebas automaticas que pasan
+  y `R CMD check` sin errores, warnings ni notas.
+- Reproduce el codigo original de John Barrera.
+- Optimizado (~2.3x más rapido que la versión inicial) sin alterar los
+  resultados.
+- Cinco graficos de diagnostico/resultado por ajuste, inspirados en
+  `saemix`.
+- Permite estimar la covarianza entre los efectos aleatorios de las dos
+  partes del modelo (`cov_random = "unstructured"`).
 - Publicado en
   <https://github.com/gabrielagutierrezbernal/SaemMicrobioma_01> con
   sitio de documentación e integración continua activos.
